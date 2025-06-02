@@ -13,7 +13,7 @@ const Footer = () => {
               <div className="bg-gradient-to-r from-blue-600 to-purple-600 p-2 rounded-lg">
                 <Lightbulb className="h-6 w-6 text-white" />
               </div>
-              <span className="text-xl font-bold">IdeaSpark</span>
+              <span className="text-xl font-bold">Ideopark</span>
             </Link>
             <p className="text-slate-400 mb-4 max-w-md">
               The secure marketplace for startup ideas. Connecting visionaries with executors to build the next generation of successful companies.
@@ -41,7 +41,7 @@ const Footer = () => {
         </div>
         
         <div className="border-t border-slate-800 mt-8 pt-8 text-center text-slate-400">
-          <p>&copy; 2024 IdeaSpark. All rights reserved. For demonstration purposes only.</p>
+          <p>&copy; 2024 Ideopark. All rights reserved. For demonstration purposes only.</p>
         </div>
       </div>
     </footer>

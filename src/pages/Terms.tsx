@@ -1,4 +1,3 @@
-
 import React from 'react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
@@ -18,14 +17,14 @@ const Terms = () => {
               <section>
                 <h2 className="text-2xl font-semibold text-slate-900 mb-4">1. Acceptance of Terms</h2>
                 <p className="leading-relaxed">
-                  By accessing and using IdeaSpark ("the Platform"), you accept and agree to be bound by the terms and provision of this agreement. If you do not agree to abide by the above, please do not use this service.
+                  By accessing and using Ideopark ("the Platform"), you accept and agree to be bound by the terms and provision of this agreement. If you do not agree to abide by the above, please do not use this service.
                 </p>
               </section>
 
               <section>
                 <h2 className="text-2xl font-semibold text-slate-900 mb-4">2. Platform Description</h2>
                 <p className="leading-relaxed mb-4">
-                  IdeaSpark is a marketplace platform that connects idea creators with potential executors. The platform allows:
+                  Ideopark is a marketplace platform that connects idea creators with potential executors. The platform allows:
                 </p>
                 <ul className="list-disc list-inside space-y-2 ml-4">
                   <li>Idea creators to submit and protect their startup ideas</li>
@@ -54,7 +53,7 @@ const Terms = () => {
               <section>
                 <h2 className="text-2xl font-semibold text-slate-900 mb-4">4. Intellectual Property</h2>
                 <p className="leading-relaxed">
-                  Idea creators retain ownership of their submitted ideas. By using the platform, creators grant IdeaSpark a limited license to display teasers publicly and full ideas to authorized, paying users only.
+                  Idea creators retain ownership of their submitted ideas. By using the platform, creators grant Ideopark a limited license to display teasers publicly and full ideas to authorized, paying users only.
                 </p>
               </section>
 
@@ -68,28 +67,28 @@ const Terms = () => {
               <section>
                 <h2 className="text-2xl font-semibold text-slate-900 mb-4">6. Limitation of Liability</h2>
                 <p className="leading-relaxed">
-                  IdeaSpark acts as a platform facilitator only. We are not responsible for the success or failure of any idea execution, disputes between users, or the enforcement of equity agreements.
+                  Ideopark acts as a platform facilitator only. We are not responsible for the success or failure of any idea execution, disputes between users, or the enforcement of equity agreements.
                 </p>
               </section>
 
               <section>
                 <h2 className="text-2xl font-semibold text-slate-900 mb-4">7. Termination</h2>
                 <p className="leading-relaxed">
-                  Either party may terminate their account at any time. IdeaSpark reserves the right to suspend or terminate accounts that violate these terms.
+                  Either party may terminate their account at any time. Ideopark reserves the right to suspend or terminate accounts that violate these terms.
                 </p>
               </section>
 
               <section>
                 <h2 className="text-2xl font-semibold text-slate-900 mb-4">8. Changes to Terms</h2>
                 <p className="leading-relaxed">
-                  IdeaSpark reserves the right to modify these terms at any time. Users will be notified of significant changes via email.
+                  Ideopark reserves the right to modify these terms at any time. Users will be notified of significant changes via email.
                 </p>
               </section>
 
               <section>
                 <h2 className="text-2xl font-semibold text-slate-900 mb-4">9. Contact Information</h2>
                 <p className="leading-relaxed">
-                  For questions about these Terms of Service, please contact us at legal@ideaspark.com
+                  For questions about these Terms of Service, please contact us at legal@ideopark.com
                 </p>
               </section>
             </div>

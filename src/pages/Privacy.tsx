@@ -1,4 +1,3 @@
-
 import React from 'react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
@@ -104,7 +103,7 @@ const Privacy = () => {
               <section>
                 <h2 className="text-2xl font-semibold text-slate-900 mb-4">8. Children's Privacy</h2>
                 <p className="leading-relaxed">
-                  IdeaSpark is not intended for users under 18. We do not knowingly collect personal information from children under 18.
+                  Ideopark is not intended for users under 18. We do not knowingly collect personal information from children under 18.
                 </p>
               </section>
 
@@ -118,7 +117,7 @@ const Privacy = () => {
               <section>
                 <h2 className="text-2xl font-semibold text-slate-900 mb-4">10. Contact Us</h2>
                 <p className="leading-relaxed">
-                  For privacy-related questions or to exercise your rights, contact us at privacy@ideaspark.com or through our platform's privacy settings.
+                  For privacy-related questions or to exercise your rights, contact us at privacy@ideopark.com or through our platform's privacy settings.
                 </p>
               </section>
             </div>
