@@ -20,8 +20,8 @@ const Navbar = () => {
             <Link to="/explore" className="text-slate-600 hover:text-slate-900 transition-colors">
               Explore Ideas
             </Link>
-            <Link to="/how-it-works" className="text-slate-600 hover:text-slate-900 transition-colors">
-              How it Works
+            <Link to="/pricing" className="text-slate-600 hover:text-slate-900 transition-colors">
+              Pricing
             </Link>
             <Link to="/login" className="text-slate-600 hover:text-slate-900 transition-colors">
               Login
