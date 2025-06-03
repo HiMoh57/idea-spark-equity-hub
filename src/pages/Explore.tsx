@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -48,9 +47,7 @@ const Explore = () => {
           views,
           interests,
           created_at,
-          profiles!creator_id (
-            full_name
-          )
+          creator_id
         `)
         .eq('status', 'approved');
 
@@ -63,12 +60,28 @@ const Explore = () => {
         query = query.order('interests', { ascending: false });
       }
 
-      const { data, error } = await query;
+      const { data: ideasData, error: ideasError } = await query;
 
-      if (error) throw error;
+      if (ideasError) throw ideasError;
 
-      // Transform the data to match our interface
-      const transformedIdeas = data?.map(idea => ({
+      if (!ideasData || ideasData.length === 0) {
+        setIdeas([]);
+        return;
+      }
+
+      // Fetch creator names separately
+      const creatorIds = [...new Set(ideasData.map(idea => idea.creator_id))];
+      const { data: profiles, error: profilesError } = await supabase
+        .from('profiles')
+        .select('id, full_name')
+        .in('id', creatorIds);
+
+      if (profilesError) {
+        console.error('Error fetching profiles:', profilesError);
+      }
+
+      // Combine ideas with creator names
+      const ideasWithCreators = ideasData.map(idea => ({
         id: idea.id,
         title: idea.title,
         teaser: idea.teaser,
@@ -77,10 +90,10 @@ const Explore = () => {
         views: idea.views || 0,
         interests: idea.interests || 0,
         created_at: idea.created_at,
-        creator_name: idea.profiles?.full_name || 'Anonymous'
-      })) || [];
+        creator_name: profiles?.find(p => p.id === idea.creator_id)?.full_name || 'Anonymous'
+      }));
 
-      setIdeas(transformedIdeas);
+      setIdeas(ideasWithCreators);
     } catch (error: any) {
       toast({
         title: "Error loading ideas",
