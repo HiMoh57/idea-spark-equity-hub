@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -9,8 +9,17 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Badge } from '@/components/ui/badge';
 import { Lightbulb, Plus, X, AlertCircle } from 'lucide-react';
 import Navbar from '@/components/Navbar';
+import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/hooks/useAuth';
+import { useNavigate } from 'react-router-dom';
+import { useToast } from '@/hooks/use-toast';
 
 const SubmitIdea = () => {
+  const { user, loading: authLoading } = useAuth();
+  const navigate = useNavigate();
+  const { toast } = useToast();
+  const [submitting, setSubmitting] = useState(false);
+
   const [formData, setFormData] = useState({
     title: '',
     teaser: '',
@@ -18,11 +27,16 @@ const SubmitIdea = () => {
     category: '',
     tags: [] as string[],
     newTag: '',
-    equityPercentage: '3',
-    boardSeat: true,
+    equityPercentage: 3,
   });
 
   const categories = ['HealthTech', 'EdTech', 'FinTech', 'Sustainability', 'AgriTech', 'Enterprise', 'Consumer', 'Other'];
+
+  useEffect(() => {
+    if (!authLoading && !user) {
+      navigate('/auth');
+    }
+  }, [user, authLoading, navigate]);
 
   const handleAddTag = () => {
     if (formData.newTag.trim() && !formData.tags.includes(formData.newTag.trim())) {
@@ -41,11 +55,64 @@ const SubmitIdea = () => {
     });
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('Idea submitted:', formData);
-    // Handle idea submission logic here
+    if (!user) return;
+
+    setSubmitting(true);
+
+    try {
+      const { error } = await supabase
+        .from('ideas')
+        .insert({
+          creator_id: user.id,
+          title: formData.title,
+          teaser: formData.teaser,
+          description: formData.description,
+          category: formData.category,
+          tags: formData.tags,
+          equity_percentage: formData.equityPercentage,
+        });
+
+      if (error) throw error;
+
+      toast({
+        title: "Idea submitted successfully!",
+        description: "Your idea is now under review and will be published once approved.",
+      });
+
+      // Reset form
+      setFormData({
+        title: '',
+        teaser: '',
+        description: '',
+        category: '',
+        tags: [],
+        newTag: '',
+        equityPercentage: 3,
+      });
+
+      navigate('/explore');
+    } catch (error: any) {
+      toast({
+        title: "Error submitting idea",
+        description: error.message,
+        variant: "destructive",
+      });
+    } finally {
+      setSubmitting(false);
+    }
   };
+
+  if (authLoading) {
+    return <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 flex items-center justify-center">
+      <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600"></div>
+    </div>;
+  }
+
+  if (!user) {
+    return null;
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
@@ -155,8 +222,8 @@ const SubmitIdea = () => {
                   <h3 className="text-lg font-semibold text-slate-900 mb-4">Partnership Terms</h3>
                   
                   <div>
-                    <Label htmlFor="equity">Equity Percentage for Executor</Label>
-                    <Select value={formData.equityPercentage} onValueChange={(value) => setFormData({...formData, equityPercentage: value})}>
+                    <Label htmlFor="equity">Equity Percentage for You</Label>
+                    <Select value={formData.equityPercentage.toString()} onValueChange={(value) => setFormData({...formData, equityPercentage: parseInt(value)})}>
                       <SelectTrigger className="mt-1">
                         <SelectValue />
                       </SelectTrigger>
@@ -182,8 +249,12 @@ const SubmitIdea = () => {
                   </ul>
                 </div>
 
-                <Button type="submit" className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700">
-                  Submit Idea for Review
+                <Button 
+                  type="submit" 
+                  className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
+                  disabled={submitting}
+                >
+                  {submitting ? "Submitting..." : "Submit Idea for Review"}
                 </Button>
               </form>
             </CardContent>

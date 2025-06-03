@@ -1,90 +1,85 @@
 
-import React, { useState } from 'react';
-import { Button } from '@/components/ui/button';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Search, Eye, Heart, Clock, Filter } from 'lucide-react';
+import { Search, Filter } from 'lucide-react';
 import Navbar from '@/components/Navbar';
 import IdeaCard from '@/components/IdeaCard';
+import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
+
+interface Idea {
+  id: string;
+  title: string;
+  teaser: string;
+  category: string;
+  tags: string[];
+  views: number;
+  interests: number;
+  created_at: string;
+  profiles?: {
+    full_name: string;
+  };
+}
 
 const Explore = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [sortBy, setSortBy] = useState('newest');
+  const [ideas, setIdeas] = useState<Idea[]>([]);
+  const [loading, setLoading] = useState(true);
+  const { toast } = useToast();
 
-  // Mock data for demonstration
-  const ideas = [
-    {
-      id: '1',
-      title: 'EcoDelivery',
-      teaser: 'Carbon-neutral delivery service using electric bikes and optimized routing',
-      category: 'Sustainability',
-      tags: ['GreenTech', 'Logistics', 'B2B'],
-      views: 234,
-      interests: 12,
-      createdAt: '2024-01-15',
-      creator: 'Sarah Chen'
-    },
-    {
-      id: '2', 
-      title: 'MindfulAI',
-      teaser: 'AI-powered mental health companion for personalized therapy sessions',
-      category: 'HealthTech',
-      tags: ['AI', 'Mental Health', 'B2C'],
-      views: 567,
-      interests: 28,
-      createdAt: '2024-01-20',
-      creator: 'Dr. Michael Torres'
-    },
-    {
-      id: '3',
-      title: 'CodeMentor',
-      teaser: 'Real-time code review platform connecting junior developers with seniors',
-      category: 'EdTech',
-      tags: ['Developer Tools', 'Education', 'SaaS'],
-      views: 189,
-      interests: 8,
-      createdAt: '2024-01-18',
-      creator: 'Alex Kim'
-    },
-    {
-      id: '4',
-      title: 'FarmConnect',
-      teaser: 'Direct farm-to-consumer marketplace with blockchain supply tracking',
-      category: 'AgriTech',
-      tags: ['Blockchain', 'Marketplace', 'Food'],
-      views: 345,
-      interests: 19,
-      createdAt: '2024-01-22',
-      creator: 'Maria Rodriguez'
-    },
-    {
-      id: '5',
-      title: 'VirtualOffice',
-      teaser: 'Immersive VR workspace for remote teams with spatial audio',
-      category: 'Enterprise',
-      tags: ['VR', 'Remote Work', 'B2B'],
-      views: 423,
-      interests: 31,
-      createdAt: '2024-01-25',
-      creator: 'James Wilson'
-    },
-    {
-      id: '6',
-      title: 'PetCare+',
-      teaser: 'Smart pet monitoring system with health tracking and vet consultations',
-      category: 'PetTech',
-      tags: ['IoT', 'Healthcare', 'Consumer'],
-      views: 156,
-      interests: 6,
-      createdAt: '2024-01-12',
-      creator: 'Emily Zhang'
+  const categories = ['all', 'HealthTech', 'EdTech', 'FinTech', 'Sustainability', 'AgriTech', 'Enterprise', 'Consumer', 'Other'];
+
+  useEffect(() => {
+    fetchIdeas();
+  }, [sortBy]);
+
+  const fetchIdeas = async () => {
+    try {
+      let query = supabase
+        .from('ideas')
+        .select(`
+          id,
+          title,
+          teaser,
+          category,
+          tags,
+          views,
+          interests,
+          created_at,
+          profiles:creator_id (
+            full_name
+          )
+        `)
+        .eq('status', 'approved');
+
+      // Apply sorting
+      if (sortBy === 'newest') {
+        query = query.order('created_at', { ascending: false });
+      } else if (sortBy === 'popular') {
+        query = query.order('views', { ascending: false });
+      } else if (sortBy === 'interests') {
+        query = query.order('interests', { ascending: false });
+      }
+
+      const { data, error } = await query;
+
+      if (error) throw error;
+
+      setIdeas(data || []);
+    } catch (error: any) {
+      toast({
+        title: "Error loading ideas",
+        description: error.message,
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
     }
-  ];
-
-  const categories = ['all', 'HealthTech', 'EdTech', 'Sustainability', 'AgriTech', 'Enterprise', 'PetTech'];
+  };
 
   const filteredIdeas = ideas.filter(idea => {
     const matchesSearch = idea.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -93,6 +88,17 @@ const Explore = () => {
     const matchesCategory = selectedCategory === 'all' || idea.category === selectedCategory;
     return matchesSearch && matchesCategory;
   });
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
+        <Navbar />
+        <div className="pt-20 flex items-center justify-center min-h-[60vh]">
+          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600"></div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
@@ -159,9 +165,20 @@ const Explore = () => {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredIdeas.map(idea => (
-              <IdeaCard key={idea.id} idea={idea} />
-            ))}
+            {filteredIdeas.map(idea => {
+              const ideaData = {
+                id: idea.id,
+                title: idea.title,
+                teaser: idea.teaser,
+                category: idea.category,
+                tags: idea.tags,
+                views: idea.views,
+                interests: idea.interests,
+                createdAt: idea.created_at,
+                creator: idea.profiles?.full_name || 'Anonymous'
+              };
+              return <IdeaCard key={idea.id} idea={ideaData} />;
+            })}
           </div>
 
           {filteredIdeas.length === 0 && (

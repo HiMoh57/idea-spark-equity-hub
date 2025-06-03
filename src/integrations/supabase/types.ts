@@ -9,13 +9,199 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      access_requests: {
+        Row: {
+          created_at: string
+          id: string
+          idea_id: string
+          payment_amount: number | null
+          requester_id: string
+          status: string | null
+          stripe_session_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          idea_id: string
+          payment_amount?: number | null
+          requester_id: string
+          status?: string | null
+          stripe_session_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          idea_id?: string
+          payment_amount?: number | null
+          requester_id?: string
+          status?: string | null
+          stripe_session_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "access_requests_idea_id_fkey"
+            columns: ["idea_id"]
+            isOneToOne: false
+            referencedRelation: "ideas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      idea_interests: {
+        Row: {
+          created_at: string
+          id: string
+          idea_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          idea_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          idea_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "idea_interests_idea_id_fkey"
+            columns: ["idea_id"]
+            isOneToOne: false
+            referencedRelation: "ideas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      idea_views: {
+        Row: {
+          created_at: string
+          id: string
+          idea_id: string
+          ip_address: unknown | null
+          viewer_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          idea_id: string
+          ip_address?: unknown | null
+          viewer_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          idea_id?: string
+          ip_address?: unknown | null
+          viewer_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "idea_views_idea_id_fkey"
+            columns: ["idea_id"]
+            isOneToOne: false
+            referencedRelation: "ideas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ideas: {
+        Row: {
+          category: string
+          created_at: string
+          creator_id: string
+          description: string
+          equity_percentage: number | null
+          id: string
+          interests: number | null
+          status: string | null
+          tags: string[] | null
+          teaser: string
+          title: string
+          updated_at: string
+          views: number | null
+        }
+        Insert: {
+          category: string
+          created_at?: string
+          creator_id: string
+          description: string
+          equity_percentage?: number | null
+          id?: string
+          interests?: number | null
+          status?: string | null
+          tags?: string[] | null
+          teaser: string
+          title: string
+          updated_at?: string
+          views?: number | null
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          creator_id?: string
+          description?: string
+          equity_percentage?: number | null
+          id?: string
+          interests?: number | null
+          status?: string | null
+          tags?: string[] | null
+          teaser?: string
+          title?: string
+          updated_at?: string
+          views?: number | null
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          bio: string | null
+          created_at: string
+          experience: string | null
+          full_name: string | null
+          id: string
+          updated_at: string
+          user_type: string | null
+        }
+        Insert: {
+          bio?: string | null
+          created_at?: string
+          experience?: string | null
+          full_name?: string | null
+          id: string
+          updated_at?: string
+          user_type?: string | null
+        }
+        Update: {
+          bio?: string | null
+          created_at?: string
+          experience?: string | null
+          full_name?: string | null
+          id?: string
+          updated_at?: string
+          user_type?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      increment_idea_views: {
+        Args: { idea_uuid: string; viewer_ip?: unknown }
+        Returns: undefined
+      }
+      toggle_idea_interest: {
+        Args: { idea_uuid: string }
+        Returns: boolean
+      }
     }
     Enums: {
       [_ in never]: never
