@@ -3,10 +3,10 @@ import React from 'react';
 
 const Stats = () => {
   const stats = [
-    { number: '500+', label: 'Ideas Submitted' },
-    { number: '150+', label: 'Active Executors' },
-    { number: '$2M+', label: 'Raised by Partners' },
-    { number: '95%', label: 'Success Rate' },
+    { number: '30+', label: 'Ideas Submitted' },
+    { number: '3+', label: 'Active Executors' },
+    { number: '0', label: 'Raised by Partners' },
+    { number: '0', label: 'Success Rate' },
   ];
 
   return (
