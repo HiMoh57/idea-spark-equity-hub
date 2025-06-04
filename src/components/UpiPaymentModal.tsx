@@ -69,7 +69,7 @@ const UpiPaymentModal: React.FC<UpiPaymentModalProps> = ({
           idea_id: ideaId,
           requester_id: (await supabase.auth.getUser()).data.user?.id,
           payment_amount: amount * 100, // Convert to paise
-          status: 'payment_pending'
+          status: 'pending'
         })
         .select()
         .single();
