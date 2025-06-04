@@ -11,6 +11,7 @@ import Login from "./pages/Login";
 import Auth from "./pages/Auth";
 import Explore from "./pages/Explore";
 import SubmitIdea from "./pages/SubmitIdea";
+import Dashboard from "./pages/Dashboard";
 import Pricing from "./pages/Pricing";
 import Terms from "./pages/Terms";
 import Privacy from "./pages/Privacy";
@@ -33,6 +34,7 @@ const App = () => (
             <Route path="/auth" element={<Auth />} />
             <Route path="/explore" element={<Explore />} />
             <Route path="/submit-idea" element={<SubmitIdea />} />
+            <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/pricing" element={<Pricing />} />
             <Route path="/terms" element={<Terms />} />
             <Route path="/privacy" element={<Privacy />} />
