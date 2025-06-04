@@ -176,7 +176,7 @@ const UpiPaymentModal: React.FC<UpiPaymentModalProps> = ({
             <h4 className="font-medium">Verify Your Payment</h4>
             
             <div>
-              <Label htmlFor="transactionId">Transaction ID (Optional)</Label>
+              <Label htmlFor="transactionId">Transaction ID</Label>
               <Input
                 id="transactionId"
                 value={paymentDetails.transactionId}
@@ -189,7 +189,7 @@ const UpiPaymentModal: React.FC<UpiPaymentModalProps> = ({
             </div>
 
             <div>
-              <Label htmlFor="upiRef">UPI Reference Number (Optional)</Label>
+              <Label htmlFor="upiRef">UPI Reference Number</Label>
               <Input
                 id="upiRef"
                 value={paymentDetails.upiRef}
@@ -202,7 +202,7 @@ const UpiPaymentModal: React.FC<UpiPaymentModalProps> = ({
             </div>
 
             <div>
-              <Label htmlFor="screenshot">Payment Screenshot (Optional)</Label>
+              <Label htmlFor="screenshot">Payment Screenshot (Don't crop the image!)</Label>
               <div className="mt-1">
                 <Input
                   id="screenshot"
