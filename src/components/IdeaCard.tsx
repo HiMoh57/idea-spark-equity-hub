@@ -282,7 +282,7 @@ const IdeaCard: React.FC<IdeaCardProps> = ({
                 size="sm"
               >
                 <Lock className="h-4 w-4 mr-2" />
-                Access Full Details - ₹15
+                Access Full Details - ₹150
               </Button>
             )}
           </div>
@@ -294,7 +294,7 @@ const IdeaCard: React.FC<IdeaCardProps> = ({
         onClose={() => setPaymentModalOpen(false)}
         ideaId={idea.id}
         ideaTitle={idea.title}
-        amount={15}
+        amount={150}
         onPaymentSuccess={handlePaymentSuccess}
       />
     </>
