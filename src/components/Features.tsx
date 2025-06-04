@@ -22,7 +22,7 @@ const Features = () => {
     {
       icon: TrendingUp,
       title: 'Equity-Based Partnership',
-      description: 'Retain 3-5% equity and potential board seat while someone else builds your idea.',
+      description: 'Retain 5-15% equity and potential board seat while someone else builds your idea.',
       color: 'from-purple-500 to-violet-600',
       bgColor: 'from-purple-50 to-violet-50',
     },
