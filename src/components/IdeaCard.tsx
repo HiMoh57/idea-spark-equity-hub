@@ -76,7 +76,7 @@ const IdeaCard: React.FC<IdeaCardProps> = ({ idea }) => {
           className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
         >
           <Lock className="h-4 w-4 mr-2" />
-          Request Full Access - $25
+          Request Full Access - $10
         </Button>
       </CardContent>
     </Card>
