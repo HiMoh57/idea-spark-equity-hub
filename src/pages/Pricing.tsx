@@ -26,7 +26,7 @@ const Pricing = () => {
     },
     {
       name: 'Pro Creator',
-      price: '$29',
+      price: '$10',
       period: '/month',
       description: 'Enhanced features for serious entrepreneurs',
       features: [
@@ -125,7 +125,7 @@ const Pricing = () => {
 
           <div className="text-center mt-16">
             <p className="text-slate-600 mb-4">
-              For Idea Executors: Pay only $49 per idea access + agree to equity terms
+              For Idea Executors: Pay only $15 per idea access + agree to equity terms
             </p>
             <p className="text-sm text-slate-500">
               All plans include 30-day money-back guarantee. Cancel anytime.
