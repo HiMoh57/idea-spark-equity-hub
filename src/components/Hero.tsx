@@ -79,7 +79,7 @@ const Hero = () => {
             <div className="flex flex-col items-center p-6 bg-white/60 backdrop-blur-sm rounded-2xl border border-slate-200/50 shadow-sm">
               <Star className="h-8 w-8 text-yellow-500 mb-3" />
               <h3 className="font-semibold text-slate-900 mb-1">Fair Equity Terms</h3>
-              <p className="text-sm text-slate-600 text-center">3-5% equity + board seat guaranteed</p>
+              <p className="text-sm text-slate-600 text-center">5-15% equity + Non-Voting Board Seat Guaranteed</p>
             </div>
           </div>
         </div>
