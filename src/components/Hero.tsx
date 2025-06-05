@@ -51,6 +51,8 @@ const Hero = () => {
             <br className="hidden md:block" />
             <span className="text-blue-600 font-medium">Protect your ideas</span> while building the next big thing together.
           </p>
+
+          <a href="https://www.producthunt.com/products/ideopark?embed=true&utm_source=badge-featured&utm_medium=badge&utm_source=badge-ideopark" target="_blank"><img src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=974473&theme=light&t=1749130193048" alt="IdeoPark - Got&#0032;Startup&#0032;Ideas&#0063;&#0032;We’ve&#0032;Got&#0032;Your&#0032;Back&#0040;end&#0041;&#0046; | Product Hunt" style="width: 250px; height: 54px;" width="250" height="54" /></a>
           
           <div className="flex flex-col sm:flex-row gap-6 justify-center items-center mb-16">
             <Button asChild size="lg" className="bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 hover:from-blue-700 hover:via-purple-700 hover:to-indigo-700 text-lg px-10 py-4 h-auto shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-105">
