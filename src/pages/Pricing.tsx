@@ -114,7 +114,7 @@ const Pricing = () => {
                       : 'bg-gradient-to-r from-blue-500 to-cyan-600 hover:from-blue-600 hover:to-cyan-700'
                     }`}
                   >
-                    <Link to="/register">
+                    <Link to="/auth">
                       {plan.price === 'Free' ? 'Get Started Free' : plan.price === 'Custom' ? 'Contact Sales' : 'Start Free Trial'}
                     </Link>
                   </Button>
