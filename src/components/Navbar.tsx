@@ -38,7 +38,7 @@ const Navbar = () => {
               Pricing
             </Link>
 
-            <Link to="/pages/Dashboard" className="text-slate-600 hover:text-slate-900 transition-colors">
+            <Link to="/dashboard" className="text-slate-600 hover:text-slate-900 transition-colors">
               Dashboard
             </Link>
             
