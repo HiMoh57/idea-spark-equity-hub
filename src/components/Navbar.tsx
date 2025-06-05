@@ -37,6 +37,10 @@ const Navbar = () => {
             <Link to="/pricing" className="text-slate-600 hover:text-slate-900 transition-colors">
               Pricing
             </Link>
+
+            <Link to="/pages/Dashboard" className="text-slate-600 hover:text-slate-900 transition-colors">
+              Dashboard
+            </Link>
             
             {user ? (
               <div className="flex items-center space-x-4">
