@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -12,12 +13,14 @@ interface Idea {
   id: string;
   title: string;
   teaser: string;
+  description?: string;
   category: string;
   tags: string[];
   views: number;
   interests: number;
   created_at: string;
-  creator_name: string;
+  creator_id: string;
+  equity_percentage: number;
 }
 
 const Explore = () => {
@@ -42,12 +45,14 @@ const Explore = () => {
           id,
           title,
           teaser,
+          description,
           category,
           tags,
           views,
           interests,
           created_at,
-          creator_id
+          creator_id,
+          equity_percentage
         `)
         .eq('status', 'approved');
 
@@ -64,36 +69,7 @@ const Explore = () => {
 
       if (ideasError) throw ideasError;
 
-      if (!ideasData || ideasData.length === 0) {
-        setIdeas([]);
-        return;
-      }
-
-      // Fetch creator names separately
-      const creatorIds = [...new Set(ideasData.map(idea => idea.creator_id))];
-      const { data: profiles, error: profilesError } = await supabase
-        .from('profiles')
-        .select('id, full_name')
-        .in('id', creatorIds);
-
-      if (profilesError) {
-        console.error('Error fetching profiles:', profilesError);
-      }
-
-      // Combine ideas with creator names
-      const ideasWithCreators = ideasData.map(idea => ({
-        id: idea.id,
-        title: idea.title,
-        teaser: idea.teaser,
-        category: idea.category,
-        tags: idea.tags || [],
-        views: idea.views || 0,
-        interests: idea.interests || 0,
-        created_at: idea.created_at,
-        creator_name: profiles?.find(p => p.id === idea.creator_id)?.full_name || 'Anonymous'
-      }));
-
-      setIdeas(ideasWithCreators);
+      setIdeas(ideasData || []);
     } catch (error: any) {
       toast({
         title: "Error loading ideas",
@@ -189,20 +165,9 @@ const Explore = () => {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredIdeas.map(idea => {
-              const ideaData = {
-                id: idea.id,
-                title: idea.title,
-                teaser: idea.teaser,
-                category: idea.category,
-                tags: idea.tags,
-                views: idea.views,
-                interests: idea.interests,
-                createdAt: idea.created_at,
-                creator: idea.creator_name
-              };
-              return <IdeaCard key={idea.id} idea={ideaData} />;
-            })}
+            {filteredIdeas.map(idea => (
+              <IdeaCard key={idea.id} idea={idea} onAccessGranted={() => fetchIdeas()} />
+            ))}
           </div>
 
           {filteredIdeas.length === 0 && (

@@ -7,7 +7,7 @@ import { Eye, Heart, Clock, User, Lock, MessageSquare, Bookmark } from 'lucide-r
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import UpiPaymentModal from './UpiPaymentModal';
+import StripePaymentModal from './StripePaymentModal';
 
 interface IdeaCardProps {
   idea: {
@@ -189,9 +189,10 @@ const IdeaCard: React.FC<IdeaCardProps> = ({
 
   const handlePaymentSuccess = () => {
     toast({
-      title: "Payment submitted!",
-      description: "Your payment is being verified. You'll get access once approved."
+      title: "Payment successful!",
+      description: "You now have access to the full idea description."
     });
+    setHasAccess(true);
     onAccessGranted?.();
   };
 
@@ -254,47 +255,49 @@ const IdeaCard: React.FC<IdeaCardProps> = ({
             </div>
           </div>
 
-          <div className="flex gap-2">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={handleToggleInterest}
-              className={isInterested ? "bg-red-50 border-red-200 text-red-700" : ""}
-            >
-              <Heart className={`h-4 w-4 mr-1 ${isInterested ? 'fill-red-500 text-red-500' : ''}`} />
-              {isInterested ? 'Interested' : 'Show Interest'}
-            </Button>
+          <div className="space-y-2">
+            <div className="flex gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleToggleInterest}
+                className={isInterested ? "bg-red-50 border-red-200 text-red-700" : ""}
+              >
+                <Heart className={`h-4 w-4 mr-1 ${isInterested ? 'fill-red-500 text-red-500' : ''}`} />
+                {isInterested ? 'Interested' : 'Show Interest'}
+              </Button>
 
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={handleToggleSave}
-              className={isSaved ? "bg-blue-50 border-blue-200 text-blue-700" : ""}
-            >
-              <Bookmark className={`h-4 w-4 mr-1 ${isSaved ? 'fill-blue-500 text-blue-500' : ''}`} />
-              {isSaved ? 'Saved' : 'Save'}
-            </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleToggleSave}
+                className={isSaved ? "bg-blue-50 border-blue-200 text-blue-700" : ""}
+              >
+                <Bookmark className={`h-4 w-4 mr-1 ${isSaved ? 'fill-blue-500 text-blue-500' : ''}`} />
+                {isSaved ? 'Saved' : 'Save'}
+              </Button>
+            </div>
 
             {!hasAccess && (
               <Button 
                 onClick={handleRequestAccess}
-                className="flex-1 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
+                className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
                 size="sm"
               >
                 <Lock className="h-4 w-4 mr-2" />
-                Access Full Details - ₹150
+                Access Full Details - $15
               </Button>
             )}
           </div>
         </CardContent>
       </Card>
 
-      <UpiPaymentModal
+      <StripePaymentModal
         isOpen={paymentModalOpen}
         onClose={() => setPaymentModalOpen(false)}
         ideaId={idea.id}
         ideaTitle={idea.title}
-        amount={150}
+        amount={15}
         onPaymentSuccess={handlePaymentSuccess}
       />
     </>
