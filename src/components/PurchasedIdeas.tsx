@@ -1,0 +1,176 @@
+
+import React, { useState, useEffect } from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Eye, Calendar, DollarSign, MessageSquare } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/hooks/useAuth';
+import { useToast } from '@/hooks/use-toast';
+import ProposalModal from '@/components/ProposalModal';
+
+interface PurchasedIdea {
+  id: string;
+  title: string;
+  teaser: string;
+  description: string;
+  category: string;
+  tags: string[];
+  equity_percentage: number;
+  creator_id: string;
+  access_granted_at: string;
+  payment_amount: number;
+  verification_status: string;
+}
+
+const PurchasedIdeas = () => {
+  const { user } = useAuth();
+  const { toast } = useToast();
+  const [purchasedIdeas, setPurchasedIdeas] = useState<PurchasedIdea[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [selectedIdea, setSelectedIdea] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (user) {
+      fetchPurchasedIdeas();
+    }
+  }, [user]);
+
+  const fetchPurchasedIdeas = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('access_requests')
+        .select(`
+          id,
+          payment_amount,
+          created_at,
+          ideas!inner (
+            id,
+            title,
+            teaser,
+            description,
+            category,
+            tags,
+            equity_percentage,
+            creator_id
+          ),
+          payment_verifications (
+            verification_status
+          )
+        `)
+        .eq('requester_id', user?.id)
+        .eq('payment_verifications.verification_status', 'verified');
+
+      if (error) throw error;
+
+      const formattedIdeas = data?.map(item => ({
+        id: item.ideas.id,
+        title: item.ideas.title,
+        teaser: item.ideas.teaser,
+        description: item.ideas.description,
+        category: item.ideas.category,
+        tags: item.ideas.tags || [],
+        equity_percentage: item.ideas.equity_percentage,
+        creator_id: item.ideas.creator_id,
+        access_granted_at: item.created_at,
+        payment_amount: item.payment_amount,
+        verification_status: item.payment_verifications?.[0]?.verification_status || 'pending'
+      })) || [];
+
+      setPurchasedIdeas(formattedIdeas);
+    } catch (error: any) {
+      toast({
+        title: "Error loading purchased ideas",
+        description: error.message,
+        variant: "destructive"
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center py-8">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+      </div>
+    );
+  }
+
+  if (purchasedIdeas.length === 0) {
+    return (
+      <Card>
+        <CardContent className="text-center py-8">
+          <Eye className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+          <h3 className="text-lg font-semibold text-gray-900 mb-2">No Purchased Ideas</h3>
+          <p className="text-gray-600">You haven't purchased access to any ideas yet.</p>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  return (
+    <div className="space-y-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {purchasedIdeas.map((idea) => (
+          <Card key={idea.id} className="hover:shadow-lg transition-shadow">
+            <CardHeader>
+              <div className="flex justify-between items-start">
+                <CardTitle className="text-lg">{idea.title}</CardTitle>
+                <Badge variant="outline">{idea.category}</Badge>
+              </div>
+              <p className="text-sm text-gray-600">{idea.teaser}</p>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                <div className="bg-green-50 p-3 rounded-lg">
+                  <h4 className="font-medium text-green-900 mb-2">Full Description</h4>
+                  <p className="text-sm text-green-800">{idea.description}</p>
+                </div>
+                
+                <div className="flex flex-wrap gap-1">
+                  {idea.tags.map((tag, index) => (
+                    <Badge key={index} variant="secondary" className="text-xs">
+                      {tag}
+                    </Badge>
+                  ))}
+                </div>
+
+                <div className="flex items-center justify-between text-sm text-gray-500">
+                  <div className="flex items-center">
+                    <DollarSign className="h-4 w-4 mr-1" />
+                    {idea.equity_percentage}% Equity
+                  </div>
+                  <div className="flex items-center">
+                    <Calendar className="h-4 w-4 mr-1" />
+                    {new Date(idea.access_granted_at).toLocaleDateString()}
+                  </div>
+                </div>
+
+                <Button
+                  onClick={() => setSelectedIdea(idea.id)}
+                  className="w-full"
+                  variant="outline"
+                >
+                  <MessageSquare className="h-4 w-4 mr-2" />
+                  Submit Proposal
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+
+      {selectedIdea && (
+        <ProposalModal
+          isOpen={!!selectedIdea}
+          onClose={() => setSelectedIdea(null)}
+          ideaId={selectedIdea}
+          onProposalSubmitted={fetchPurchasedIdeas}
+        />
+      )}
+    </div>
+  );
+};
+
+export default PurchasedIdeas;

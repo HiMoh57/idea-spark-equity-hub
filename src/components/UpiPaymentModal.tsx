@@ -4,17 +4,18 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { QrCode, Upload, CheckCircle, Loader2 } from 'lucide-react';
-import { useToast } from '@/hooks/use-toast';
+import { Card, CardContent } from '@/components/ui/card';
+import { QrCode, Upload, CheckCircle } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/hooks/useAuth';
+import { useToast } from '@/hooks/use-toast';
 
 interface UpiPaymentModalProps {
   isOpen: boolean;
   onClose: () => void;
   ideaId: string;
   ideaTitle: string;
-  amount: number;
-  onPaymentSuccess: () => void;
+  onPaymentSubmitted: () => void;
 }
 
 const UpiPaymentModal: React.FC<UpiPaymentModalProps> = ({
@@ -22,9 +23,9 @@ const UpiPaymentModal: React.FC<UpiPaymentModalProps> = ({
   onClose,
   ideaId,
   ideaTitle,
-  amount,
-  onPaymentSuccess
+  onPaymentSubmitted
 }) => {
+  const { user } = useAuth();
   const { toast } = useToast();
   const [step, setStep] = useState<'qr' | 'verification'>('qr');
   const [loading, setLoading] = useState(false);
@@ -34,35 +35,19 @@ const UpiPaymentModal: React.FC<UpiPaymentModalProps> = ({
     screenshot: null as File | null
   });
 
-  // UPI QR code data for payment - this would typically be your business UPI ID
-  const upiQrData = `upi://pay?pa=yourbusiness@paytm&pn=Ideopark&am=${amount}&cu=INR&tn=Access%20to%20${encodeURIComponent(ideaTitle)}`;
+  const amount = 150; // ₹150
+  const upiId = 'startupideas@upi'; // Your UPI ID
+  const upiUrl = `upi://pay?pa=${upiId}&am=${amount}&cu=INR&tn=Access to ${ideaTitle}`;
 
   const handlePaymentMade = () => {
     setStep('verification');
   };
 
-  const handleInputChange = (field: string, value: string) => {
-    setFormData(prev => ({
-      ...prev,
-      [field]: value
-    }));
-  };
-
-  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (file) {
-      setFormData(prev => ({
-        ...prev,
-        screenshot: file
-      }));
-    }
-  };
-
   const handleSubmitVerification = async () => {
-    if (!formData.upiId || !formData.transactionId) {
+    if (!user || !formData.upiId || !formData.transactionId) {
       toast({
         title: "Missing Information",
-        description: "Please fill in your UPI ID and Transaction ID.",
+        description: "Please fill in all required fields",
         variant: "destructive"
       });
       return;
@@ -71,63 +56,46 @@ const UpiPaymentModal: React.FC<UpiPaymentModalProps> = ({
     setLoading(true);
 
     try {
-      // First create the access request
-      const { data: accessRequest, error: accessError } = await supabase
+      // Create access request
+      const { data: accessRequest, error: requestError } = await supabase
         .from('access_requests')
         .insert({
           idea_id: ideaId,
-          requester_id: (await supabase.auth.getUser()).data.user?.id,
-          payment_amount: amount,
+          requester_id: user.id,
+          payment_amount: amount * 100, // Store in paise
           status: 'pending'
         })
         .select()
         .single();
 
-      if (accessError) throw accessError;
-
-      // Upload screenshot if provided
-      let screenshotUrl = null;
-      if (formData.screenshot) {
-        const fileExt = formData.screenshot.name.split('.').pop();
-        const fileName = `payment-${accessRequest.id}.${fileExt}`;
-        
-        const { data: uploadData, error: uploadError } = await supabase.storage
-          .from('payment-screenshots')
-          .upload(fileName, formData.screenshot);
-
-        if (uploadError) {
-          console.error('Screenshot upload failed:', uploadError);
-        } else {
-          screenshotUrl = uploadData.path;
-        }
-      }
+      if (requestError) throw requestError;
 
       // Create payment verification record
       const { error: verificationError } = await supabase
         .from('payment_verifications')
         .insert({
           access_request_id: accessRequest.id,
+          amount: amount * 100,
           upi_id: formData.upiId,
           transaction_id: formData.transactionId,
-          amount: amount,
-          verification_status: 'pending',
-          screenshot_url: screenshotUrl
+          verification_status: 'pending'
         });
 
       if (verificationError) throw verificationError;
 
       toast({
-        title: "Payment Submitted for Verification",
-        description: "Your payment details have been submitted. We'll verify and grant access within 24 hours.",
+        title: "Verification Submitted!",
+        description: "Your payment verification has been submitted. We'll review it shortly.",
       });
 
+      onPaymentSubmitted();
       onClose();
-      onPaymentSuccess();
-
+      setStep('qr');
+      setFormData({ upiId: '', transactionId: '', screenshot: null });
     } catch (error: any) {
       toast({
         title: "Submission Error",
-        description: error.message || "Failed to submit payment verification. Please try again.",
+        description: error.message,
         variant: "destructive"
       });
     } finally {
@@ -135,151 +103,116 @@ const UpiPaymentModal: React.FC<UpiPaymentModalProps> = ({
     }
   };
 
-  const resetModal = () => {
-    setStep('qr');
-    setFormData({ upiId: '', transactionId: '', screenshot: null });
-  };
-
   return (
-    <Dialog open={isOpen} onOpenChange={(open) => {
-      if (!open) {
-        resetModal();
-        onClose();
-      }
-    }}>
+    <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-md">
         <DialogHeader>
-          <DialogTitle>Access Full Idea Details</DialogTitle>
+          <DialogTitle className="flex items-center gap-2">
+            <QrCode className="h-5 w-5" />
+            {step === 'qr' ? 'Pay via UPI' : 'Verify Payment'}
+          </DialogTitle>
         </DialogHeader>
 
         {step === 'qr' ? (
           <div className="space-y-6">
             <div className="text-center">
-              <h3 className="font-semibold text-lg mb-2">{ideaTitle}</h3>
-              <p className="text-3xl font-bold text-blue-600">₹{amount}</p>
-              <p className="text-sm text-gray-600 mt-2">
-                One-time payment to access the complete idea description
-              </p>
-            </div>
-
-            <div className="bg-white border-2 border-gray-200 rounded-lg p-6 text-center">
-              <div className="mb-4">
-                <QrCode className="h-32 w-32 mx-auto text-gray-400" />
-                <p className="text-sm text-gray-600 mt-2">Scan QR code with any UPI app</p>
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
+                <h3 className="font-semibold text-blue-900 mb-2">Unlock Full Idea Description</h3>
+                <p className="text-blue-800 text-sm mb-2">"{ideaTitle}"</p>
+                <p className="text-2xl font-bold text-blue-900">₹{amount}</p>
               </div>
-              
-              <div className="bg-blue-50 p-3 rounded-lg text-sm">
-                <p className="font-medium text-blue-900">Pay using:</p>
-                <p className="text-blue-800">PhonePe • Google Pay • Paytm • Amazon Pay</p>
-                <p className="text-blue-800">or any UPI-enabled app</p>
+
+              <Card className="bg-white">
+                <CardContent className="p-6">
+                  <div className="bg-gray-100 p-4 rounded-lg mb-4">
+                    <div className="w-48 h-48 mx-auto bg-white border-2 border-gray-300 rounded-lg flex items-center justify-center">
+                      <QrCode className="h-24 w-24 text-gray-600" />
+                    </div>
+                    <p className="text-xs text-gray-600 mt-2 text-center">
+                      Scan QR code with any UPI app
+                    </p>
+                  </div>
+                  
+                  <div className="text-sm text-gray-600 space-y-1">
+                    <p><strong>UPI ID:</strong> {upiId}</p>
+                    <p><strong>Amount:</strong> ₹{amount}</p>
+                    <p><strong>Note:</strong> Access to {ideaTitle}</p>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <div className="bg-green-50 border border-green-200 rounded-lg p-3">
+                <p className="text-green-800 text-sm">
+                  💳 Pay using PhonePe, Google Pay, Paytm, or any UPI app
+                </p>
               </div>
             </div>
 
-            <div className="bg-blue-50 p-4 rounded-lg">
-              <h4 className="font-medium mb-3 text-blue-900">What you'll get:</h4>
-              <ul className="text-sm text-blue-800 space-y-1">
-                <li>• Complete business idea description</li>
-                <li>• Market analysis and opportunity</li>
-                <li>• Implementation roadmap</li>
-                <li>• Equity percentage details</li>
-                <li>• Contact information for collaboration</li>
-              </ul>
-            </div>
-
-            <div className="flex gap-3">
-              <Button 
-                variant="outline" 
-                onClick={onClose}
-                className="flex-1"
-              >
-                Cancel
-              </Button>
-              <Button 
-                onClick={handlePaymentMade}
-                className="flex-1 bg-green-600 hover:bg-green-700"
-              >
-                <CheckCircle className="h-4 w-4 mr-2" />
-                I have made the payment
-              </Button>
-            </div>
+            <Button 
+              onClick={handlePaymentMade}
+              className="w-full bg-green-600 hover:bg-green-700"
+            >
+              <CheckCircle className="h-4 w-4 mr-2" />
+              I have made the payment
+            </Button>
           </div>
         ) : (
-          <div className="space-y-6">
-            <div className="text-center">
-              <CheckCircle className="h-12 w-12 text-green-600 mx-auto mb-3" />
-              <h3 className="font-semibold text-lg">Payment Verification</h3>
-              <p className="text-sm text-gray-600">
-                Please provide your payment details for verification
+          <div className="space-y-4">
+            <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
+              <p className="text-amber-800 text-sm">
+                Please provide the following details to verify your payment:
               </p>
             </div>
 
-            <div className="space-y-4">
-              <div>
-                <Label htmlFor="upi-id">UPI ID used for payment *</Label>
-                <Input
-                  id="upi-id"
-                  placeholder="e.g., yourname@paytm, 9876543210@ybl"
-                  value={formData.upiId}
-                  onChange={(e) => handleInputChange('upiId', e.target.value)}
-                />
-              </div>
+            <div>
+              <Label htmlFor="upiId">Your UPI ID *</Label>
+              <Input
+                id="upiId"
+                value={formData.upiId}
+                onChange={(e) => setFormData({...formData, upiId: e.target.value})}
+                placeholder="yourname@paytm / yourname@phonepe"
+                required
+              />
+            </div>
 
-              <div>
-                <Label htmlFor="transaction-id">Transaction ID *</Label>
-                <Input
-                  id="transaction-id"
-                  placeholder="e.g., T2024010112345678"
-                  value={formData.transactionId}
-                  onChange={(e) => handleInputChange('transactionId', e.target.value)}
-                />
-              </div>
+            <div>
+              <Label htmlFor="transactionId">Transaction ID *</Label>
+              <Input
+                id="transactionId"
+                value={formData.transactionId}
+                onChange={(e) => setFormData({...formData, transactionId: e.target.value})}
+                placeholder="Enter 12-digit transaction ID"
+                required
+              />
+            </div>
 
-              <div>
-                <Label htmlFor="screenshot">Screenshot (Optional)</Label>
-                <div className="mt-1">
-                  <Input
-                    id="screenshot"
-                    type="file"
-                    accept="image/*"
-                    onChange={handleFileUpload}
-                    className="cursor-pointer"
-                  />
-                  {formData.screenshot && (
-                    <p className="text-sm text-green-600 mt-1">
-                      ✓ {formData.screenshot.name}
-                    </p>
-                  )}
-                </div>
+            <div>
+              <Label htmlFor="screenshot">Payment Screenshot (Optional)</Label>
+              <div className="flex items-center gap-2">
+                <Input
+                  id="screenshot"
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => setFormData({...formData, screenshot: e.target.files?.[0] || null})}
+                />
+                <Upload className="h-4 w-4 text-gray-400" />
               </div>
             </div>
 
-            <div className="bg-yellow-50 p-3 rounded-lg text-sm text-yellow-800">
-              <p className="font-medium">⏱️ Verification Process</p>
-              <p>We'll verify your payment within 24 hours and grant access automatically.</p>
-            </div>
-
-            <div className="flex gap-3">
+            <div className="flex gap-2">
               <Button 
                 variant="outline" 
                 onClick={() => setStep('qr')}
                 className="flex-1"
-                disabled={loading}
               >
                 Back
               </Button>
               <Button 
                 onClick={handleSubmitVerification}
-                disabled={loading || !formData.upiId || !formData.transactionId}
-                className="flex-1 bg-blue-600 hover:bg-blue-700"
+                disabled={loading}
+                className="flex-1"
               >
-                {loading ? (
-                  <>
-                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                    Submitting...
-                  </>
-                ) : (
-                  'Submit for Verification'
-                )}
+                {loading ? "Submitting..." : "Submit for Verification"}
               </Button>
             </div>
           </div>

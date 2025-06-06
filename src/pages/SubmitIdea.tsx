@@ -27,7 +27,7 @@ const SubmitIdea = () => {
     category: '',
     tags: [] as string[],
     newTag: '',
-    equityPercentage: 3,
+    equityPercentage: 5,
   });
 
   const categories = ['HealthTech', 'EdTech', 'FinTech', 'Sustainability', 'AgriTech', 'Enterprise', 'Consumer', 'AI', 'Other'];
@@ -89,7 +89,7 @@ const SubmitIdea = () => {
         category: '',
         tags: [],
         newTag: '',
-        equityPercentage: 3,
+        equityPercentage: 5,
       });
 
       navigate('/explore');
@@ -228,17 +228,17 @@ const SubmitIdea = () => {
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="3">5% Equity</SelectItem>
-                        <SelectItem value="4">6% Equity</SelectItem>
-                        <SelectItem value="5">7% Equity</SelectItem>
-                        <SelectItem value="5">8% Equity</SelectItem>
-                        <SelectItem value="5">9% Equity</SelectItem>
-                        <SelectItem value="5">10% Equity</SelectItem>
-                        <SelectItem value="5">11% Equity</SelectItem>
-                        <SelectItem value="5">12% Equity</SelectItem>
-                        <SelectItem value="5">13% Equity</SelectItem>
-                        <SelectItem value="5">14% Equity</SelectItem>
-                        <SelectItem value="5">15% Equity</SelectItem>
+                        <SelectItem value="5">5% Equity</SelectItem>
+                        <SelectItem value="6">6% Equity</SelectItem>
+                        <SelectItem value="7">7% Equity</SelectItem>
+                        <SelectItem value="8">8% Equity</SelectItem>
+                        <SelectItem value="9">9% Equity</SelectItem>
+                        <SelectItem value="10">10% Equity</SelectItem>
+                        <SelectItem value="11">11% Equity</SelectItem>
+                        <SelectItem value="12">12% Equity</SelectItem>
+                        <SelectItem value="13">13% Equity</SelectItem>
+                        <SelectItem value="14">14% Equity</SelectItem>
+                        <SelectItem value="15">15% Equity</SelectItem>
                       </SelectContent>
                     </Select>
                     <p className="text-xs text-slate-500 mt-1">
@@ -251,7 +251,7 @@ const SubmitIdea = () => {
                   <h4 className="font-medium text-blue-900 mb-2">How it works:</h4>
                   <ul className="text-sm text-blue-800 space-y-1">
                     <li>• Your teaser will be visible to all users</li>
-                    <li>• Full details are protected behind a paywall ($15)</li>
+                    <li>• Full details are protected behind a paywall (₹150)</li>
                     <li>• Interested executors must agree to your equity terms</li>
                     <li>• You maintain control over who accesses your full idea</li>
                   </ul>
