@@ -26,7 +26,7 @@ const Pricing = () => {
     },
     {
       name: 'Pro Creator',
-      price: '$10',
+      price: '₹500',
       period: '/month',
       description: 'Enhanced features for serious entrepreneurs',
       features: [
@@ -125,9 +125,15 @@ const Pricing = () => {
 
           <div className="text-center mt-16">
             <p className="text-slate-600 mb-4">
-              For Idea Executors: Pay only $15 per idea access + agree to equity terms
+              For Idea Executors: Pay only ₹150 per idea access via UPI + agree to equity terms
             </p>
-            <p className="text-sm text-slate-500">
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 max-w-2xl mx-auto">
+              <p className="text-sm text-blue-800 font-medium mb-2">💳 Easy UPI Payments</p>
+              <p className="text-sm text-blue-700">
+                Pay instantly using PhonePe, Google Pay, Paytm, Amazon Pay, or any UPI-enabled app
+              </p>
+            </div>
+            <p className="text-sm text-slate-500 mt-4">
               All plans include 30-day money-back guarantee. Cancel anytime.
             </p>
           </div>
