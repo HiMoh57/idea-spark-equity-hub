@@ -276,7 +276,7 @@ export type Database = {
           id: string
           screenshot_url: string | null
           transaction_id: string | null
-          upi_ref: string | null
+          upi_id: string | null
           verification_status: string
           verified_at: string | null
           verified_by: string | null
@@ -288,7 +288,7 @@ export type Database = {
           id?: string
           screenshot_url?: string | null
           transaction_id?: string | null
-          upi_ref?: string | null
+          upi_id?: string | null
           verification_status?: string
           verified_at?: string | null
           verified_by?: string | null
@@ -300,7 +300,7 @@ export type Database = {
           id?: string
           screenshot_url?: string | null
           transaction_id?: string | null
-          upi_ref?: string | null
+          upi_id?: string | null
           verification_status?: string
           verified_at?: string | null
           verified_by?: string | null

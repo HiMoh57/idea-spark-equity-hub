@@ -6,6 +6,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Search, Filter } from 'lucide-react';
 import Navbar from '@/components/Navbar';
 import IdeaCard from '@/components/IdeaCard';
+import CommentSystem from '@/components/CommentSystem';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 
@@ -29,6 +30,7 @@ const Explore = () => {
   const [sortBy, setSortBy] = useState('newest');
   const [ideas, setIdeas] = useState<Idea[]>([]);
   const [loading, setLoading] = useState(true);
+  const [selectedIdeaForComments, setSelectedIdeaForComments] = useState<string | null>(null);
   const { toast } = useToast();
 
   const categories = ['all', 'HealthTech', 'EdTech', 'FinTech', 'Sustainability', 'AgriTech', 'Enterprise', 'Consumer', 'Other'];
@@ -166,7 +168,10 @@ const Explore = () => {
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredIdeas.map(idea => (
-              <IdeaCard key={idea.id} idea={idea} onAccessGranted={() => fetchIdeas()} />
+              <div key={idea.id} className="space-y-4">
+                <IdeaCard idea={idea} onAccessGranted={() => fetchIdeas()} />
+                <CommentSystem ideaId={idea.id} />
+              </div>
             ))}
           </div>
 

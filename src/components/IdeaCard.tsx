@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Eye, Heart, Clock, User, Lock, Bookmark } from 'lucide-react';
+import { Eye, Heart, Clock, User, Lock, Bookmark, CheckCircle } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
@@ -40,6 +40,7 @@ const IdeaCard: React.FC<IdeaCardProps> = ({
   const [hasAccess, setHasAccess] = useState(showFullDescription);
   const [creatorName, setCreatorName] = useState('Anonymous');
   const [pendingVerification, setPendingVerification] = useState(false);
+  const [accessGranted, setAccessGranted] = useState(false);
 
   useEffect(() => {
     if (user) {
@@ -75,16 +76,21 @@ const IdeaCard: React.FC<IdeaCardProps> = ({
       // Check if user has access to full description
       const { data: accessData } = await supabase
         .from('access_requests')
-        .select('status')
+        .select(`
+          status,
+          payment_verifications(verification_status)
+        `)
         .eq('idea_id', idea.id)
         .eq('requester_id', user.id)
-        .in('status', ['approved', 'pending'])
         .single();
 
       if (accessData) {
-        if (accessData.status === 'approved') {
+        const verificationStatus = accessData.payment_verifications?.[0]?.verification_status;
+        
+        if (accessData.status === 'approved' || verificationStatus === 'verified') {
           setHasAccess(true);
-        } else if (accessData.status === 'pending') {
+          setAccessGranted(true);
+        } else if (verificationStatus === 'pending') {
           setPendingVerification(true);
         }
       }
@@ -194,7 +200,7 @@ const IdeaCard: React.FC<IdeaCardProps> = ({
     setPaymentModalOpen(true);
   };
 
-  const handlePaymentSuccess = () => {
+  const handlePaymentSubmitted = () => {
     toast({
       title: "Payment submitted for verification!",
       description: "We'll verify your payment and grant access within 24 hours."
@@ -285,7 +291,7 @@ const IdeaCard: React.FC<IdeaCardProps> = ({
               </Button>
             </div>
 
-            {!hasAccess && !pendingVerification && (
+            {!hasAccess && !pendingVerification && !accessGranted && (
               <Button 
                 onClick={handleRequestAccess}
                 className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
@@ -296,10 +302,20 @@ const IdeaCard: React.FC<IdeaCardProps> = ({
               </Button>
             )}
 
-            {pendingVerification && (
+            {pendingVerification && !accessGranted && (
               <div className="w-full p-3 bg-yellow-50 border border-yellow-200 rounded-lg text-center">
                 <p className="text-sm text-yellow-800 font-medium">⏱️ Payment Under Verification</p>
                 <p className="text-xs text-yellow-700">We'll grant access within 24 hours</p>
+              </div>
+            )}
+
+            {accessGranted && (
+              <div className="w-full p-3 bg-green-50 border border-green-200 rounded-lg text-center">
+                <div className="flex items-center justify-center gap-2">
+                  <CheckCircle className="h-4 w-4 text-green-600" />
+                  <p className="text-sm text-green-800 font-medium">Access Granted</p>
+                </div>
+                <p className="text-xs text-green-700">Check your dashboard for full access</p>
               </div>
             )}
           </div>
@@ -311,8 +327,7 @@ const IdeaCard: React.FC<IdeaCardProps> = ({
         onClose={() => setPaymentModalOpen(false)}
         ideaId={idea.id}
         ideaTitle={idea.title}
-        amount={150}
-        onPaymentSuccess={handlePaymentSuccess}
+        onPaymentSubmitted={handlePaymentSubmitted}
       />
     </>
   );
