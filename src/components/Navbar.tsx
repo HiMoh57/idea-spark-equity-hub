@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -6,7 +5,7 @@ import { Lightbulb, LogOut } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 
 const Navbar = () => {
-  const { user, signOut } = useAuth();
+  const { user, profile, signOut } = useAuth();
   const navigate = useNavigate();
 
   const handleSignOut = async () => {
@@ -44,7 +43,9 @@ const Navbar = () => {
             
             {user ? (
               <div className="flex items-center space-x-4">
-                <span className="text-sm text-slate-600">Welcome, {user.email}</span>
+                <span className="text-sm text-slate-600">
+                  Welcome, {profile?.full_name || user.email}
+                </span>
                 <Button 
                   onClick={handleSignOut}
                   variant="outline"
