@@ -8,6 +8,8 @@ interface AuthContextType {
   profile: any | null;
   loading: boolean;
   signOut: () => Promise<void>;
+  showOnboarding: boolean;
+  setShowOnboarding: (show: boolean) => void;
 }
 
 const AuthContext = createContext<AuthContextType>({
@@ -16,6 +18,8 @@ const AuthContext = createContext<AuthContextType>({
   profile: null,
   loading: true,
   signOut: async () => {},
+  showOnboarding: false,
+  setShowOnboarding: () => {},
 });
 
 export const useAuth = () => {
@@ -31,17 +35,26 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [session, setSession] = useState<Session | null>(null);
   const [profile, setProfile] = useState<any | null>(null);
   const [loading, setLoading] = useState(true);
+  const [showOnboarding, setShowOnboarding] = useState(false);
 
+  // Fetch profile when user changes
   useEffect(() => {
-    // Fetch profile when user changes
     const fetchProfile = async (userId: string) => {
       const { data, error } = await supabase
         .from('profiles')
         .select('*')
         .eq('id', userId)
         .single();
-      if (data) setProfile(data);
-      else setProfile(null);
+      
+      if (data) {
+        setProfile(data);
+        // Show onboarding if profile is not complete
+        if (!data.profile_complete) {
+          setShowOnboarding(true);
+        }
+      } else {
+        setProfile(null);
+      }
     };
 
     if (user) {
@@ -76,7 +89,15 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, session, profile, loading, signOut }}>
+    <AuthContext.Provider value={{ 
+      user, 
+      session, 
+      profile, 
+      loading, 
+      signOut,
+      showOnboarding,
+      setShowOnboarding
+    }}>
       {children}
     </AuthContext.Provider>
   );
