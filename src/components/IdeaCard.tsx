@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -87,7 +86,7 @@ const IdeaCard: React.FC<IdeaCardProps> = ({
       if (accessData) {
         const verificationStatus = accessData.payment_verifications?.[0]?.verification_status;
         
-        if (accessData.status === 'approved' || verificationStatus === 'verified') {
+        if (accessData.status === 'approved' && verificationStatus === 'verified') {
           setHasAccess(true);
           setAccessGranted(true);
         } else if (verificationStatus === 'pending') {
