@@ -155,10 +155,11 @@ const SubmitIdea = () => {
       }
 
       // Then create the idea with file URLs
+      console.log("User ID:", user.id);
       const { error } = await supabase
         .from('ideas')
         .insert({
-          creator_id: user.id,
+          creator_id: user.id as string,
           title: formData.title,
           teaser: formData.teaser,
           description: formData.description,
