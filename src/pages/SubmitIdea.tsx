@@ -22,6 +22,7 @@ const SubmitIdea = () => {
   const { toast } = useToast();
   const [step, setStep] = useState(1);
   const [submitting, setSubmitting] = useState(false);
+  const [uploading, setUploading] = useState(false);
 
   const [formData, setFormData] = useState({
     title: '',
@@ -61,13 +62,99 @@ const SubmitIdea = () => {
     });
   };
 
+  const validateStep1 = () => {
+    if (!formData.title.trim()) {
+      toast({
+        title: "Title Required",
+        description: "Please enter a title for your idea",
+        variant: "destructive"
+      });
+      return false;
+    }
+    if (!formData.teaser.trim()) {
+      toast({
+        title: "Teaser Required",
+        description: "Please enter a teaser for your idea",
+        variant: "destructive"
+      });
+      return false;
+    }
+    if (!formData.description.trim()) {
+      toast({
+        title: "Description Required",
+        description: "Please enter a description for your idea",
+        variant: "destructive"
+      });
+      return false;
+    }
+    if (!formData.category) {
+      toast({
+        title: "Category Required",
+        description: "Please select a category for your idea",
+        variant: "destructive"
+      });
+      return false;
+    }
+    return true;
+  };
+
+  const validateStep2 = () => {
+    if (formData.attachments.length === 0) {
+      toast({
+        title: "Attachments Required",
+        description: "Please upload at least one attachment",
+        variant: "destructive"
+      });
+      return false;
+    }
+    return true;
+  };
+
+  const handleNextStep = () => {
+    if (step === 1 && !validateStep1()) return;
+    if (step === 2 && !validateStep2()) return;
+    setStep(step + 1);
+  };
+
+  const handleFileUpload = async (files: FileList | null) => {
+    if (!files || files.length === 0) return;
+    
+    const newFiles = Array.from(files);
+    setFormData(prev => ({
+      ...prev,
+      attachments: [...prev.attachments, ...newFiles]
+    }));
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!user) return;
 
     setSubmitting(true);
+    setUploading(true);
 
     try {
+      // Upload files first
+      const fileUrls = [];
+      for (const file of formData.attachments) {
+        const fileExt = file.name.split('.').pop();
+        const fileName = `${Math.random()}.${fileExt}`;
+        const filePath = `${user.id}/${fileName}`;
+
+        const { error: uploadError } = await supabase.storage
+          .from('attachments')
+          .upload(filePath, file);
+
+        if (uploadError) throw uploadError;
+
+        const { data: { publicUrl } } = supabase.storage
+          .from('attachments')
+          .getPublicUrl(filePath);
+
+        fileUrls.push(publicUrl);
+      }
+
+      // Then create the idea with file URLs
       const { error } = await supabase
         .from('ideas')
         .insert({
@@ -78,6 +165,7 @@ const SubmitIdea = () => {
           category: formData.category,
           tags: formData.tags,
           equity_percentage: formData.equityPercentage,
+          attachments: fileUrls
         });
 
       if (error) throw error;
@@ -110,6 +198,7 @@ const SubmitIdea = () => {
       });
     } finally {
       setSubmitting(false);
+      setUploading(false);
     }
   };
 
@@ -255,7 +344,7 @@ const SubmitIdea = () => {
                         </div>
                       </div>
                       <div>
-                        <Label>Attachments (Optional)</Label>
+                        <Label>Attachments (Required)</Label>
                         <div className="mt-2 border-2 border-dashed border-slate-200 rounded-lg p-6 text-center">
                           <Upload className="h-8 w-8 text-slate-400 mx-auto mb-2" />
                           <p className="text-sm text-slate-600">
@@ -265,12 +354,40 @@ const SubmitIdea = () => {
                             type="file"
                             multiple
                             className="hidden"
-                            onChange={(e) => {
-                              const files = Array.from(e.target.files || []);
-                              setFormData({ ...formData, attachments: [...formData.attachments, ...files] });
-                            }}
+                            id="file-upload"
+                            onChange={(e) => handleFileUpload(e.target.files)}
                           />
+                          <Button
+                            type="button"
+                            variant="outline"
+                            className="mt-4"
+                            onClick={() => document.getElementById('file-upload')?.click()}
+                          >
+                            Select Files
+                          </Button>
                         </div>
+                        {formData.attachments.length > 0 && (
+                          <div className="mt-4 space-y-2">
+                            {formData.attachments.map((file, index) => (
+                              <div key={index} className="flex items-center justify-between bg-slate-50 p-2 rounded">
+                                <span className="text-sm truncate">{file.name}</span>
+                                <Button
+                                  type="button"
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() => {
+                                    setFormData(prev => ({
+                                      ...prev,
+                                      attachments: prev.attachments.filter((_, i) => i !== index)
+                                    }));
+                                  }}
+                                >
+                                  <X className="h-4 w-4" />
+                                </Button>
+                              </div>
+                            ))}
+                          </div>
+                        )}
                       </div>
                     </div>
                   </>
@@ -320,7 +437,7 @@ const SubmitIdea = () => {
                   {step < 3 ? (
                     <Button
                       type="button"
-                      onClick={() => setStep(step + 1)}
+                      onClick={handleNextStep}
                       className="ml-auto"
                     >
                       Continue
@@ -329,9 +446,9 @@ const SubmitIdea = () => {
                     <Button
                       type="submit"
                       className="ml-auto"
-                      disabled={!formData.terms}
+                      disabled={!formData.terms || submitting || uploading}
                     >
-                      Submit Idea
+                      {submitting || uploading ? "Submitting..." : "Submit Idea"}
                     </Button>
                   )}
                 </div>
