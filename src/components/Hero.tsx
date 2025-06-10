@@ -39,13 +39,14 @@ const Hero = () => {
   return (
     <section className="relative pt-20 pb-32 px-4 sm:px-6 lg:px-8 overflow-hidden min-h-screen flex items-center">
       {/* Silk background */}
-      <div className="absolute inset-0 -z-10">
+      <div className="absolute inset-0 w-full h-full -z-10 pointer-events-none">
         <Silk
           speed={3}
           scale={1.5}
           color="#6366f1"
           noiseIntensity={1}
           rotation={0}
+          style={{ width: '100%', height: '100%' }}
         />
       </div>
 
