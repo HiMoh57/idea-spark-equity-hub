@@ -14,17 +14,14 @@ import { useToast } from '@/hooks/use-toast';
 interface Idea {
   id: string;
   title: string;
-  teaser: string;
-  description?: string;
+  description: string;
   category: string;
-  tags: string[];
-  views: number;
-  interests: number;
   created_at: string;
   creator_id: string;
   equity_percentage: number;
   status: string;
-  applicants: number;
+  views: number;
+  interests: number;
 }
 
 const Explore = () => {
@@ -52,22 +49,20 @@ const Explore = () => {
 
   const fetchIdeas = async () => {
     try {
+      setLoading(true);
       let query = supabase
         .from('ideas')
         .select(`
           id,
           title,
-          teaser,
           description,
           category,
-          tags,
-          views,
-          interests,
           created_at,
           creator_id,
           equity_percentage,
           status,
-          applicants
+          views,
+          interests
         `)
         .eq('status', 'approved');
 
@@ -80,15 +75,15 @@ const Explore = () => {
         query = query.order('views', { ascending: false });
       }
 
-      const { data: ideasData, error: ideasError } = await query;
+      const { data, error } = await query;
 
-      if (ideasError) throw ideasError;
-
-      setIdeas(ideasData || []);
-    } catch (error: any) {
+      if (error) throw error;
+      setIdeas(data || []);
+    } catch (error) {
+      console.error('Error fetching ideas:', error);
       toast({
-        title: "Error loading ideas",
-        description: error.message,
+        title: "Error",
+        description: "Failed to load ideas. Please try again.",
         variant: "destructive",
       });
     } finally {
@@ -98,8 +93,7 @@ const Explore = () => {
 
   const filteredIdeas = ideas.filter(idea => {
     const matchesSearch = idea.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         idea.teaser.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         idea.tags.some(tag => tag.toLowerCase().includes(searchQuery.toLowerCase()));
+                         idea.description.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesCategory = selectedCategory === 'all' || idea.category === selectedCategory;
     return matchesSearch && matchesCategory;
   });
@@ -176,7 +170,7 @@ const Explore = () => {
                     <Badge variant="secondary" className="mb-2">
                       {idea.category}
                     </Badge>
-                    <Badge variant={idea.status === "Open" ? "default" : "secondary"}>
+                    <Badge variant={idea.status === "approved" ? "default" : "secondary"}>
                       {idea.status}
                     </Badge>
                   </div>
@@ -187,11 +181,11 @@ const Explore = () => {
                   <div className="flex items-center gap-4 text-sm text-slate-500">
                     <div className="flex items-center">
                       <Users className="h-4 w-4 mr-1" />
-                      {idea.applicants} applicants
+                      {idea.interests} interested
                     </div>
                     <div className="flex items-center">
                       <Clock className="h-4 w-4 mr-1" />
-                      {idea.created_at}
+                      {new Date(idea.created_at).toLocaleDateString()}
                     </div>
                   </div>
                 </CardContent>
