@@ -1,5 +1,5 @@
 /* eslint-disable react/no-unknown-property */
-import React, { forwardRef, useMemo, useRef, useLayoutEffect } from "react";
+import React, { forwardRef, useMemo, useRef, useLayoutEffect, CSSProperties } from "react";
 import { Canvas, useFrame, useThree, RootState } from "@react-three/fiber";
 import { Color, Mesh, ShaderMaterial } from "three";
 import { IUniform } from "three";
@@ -131,6 +131,7 @@ export interface SilkProps {
   color?: string;
   noiseIntensity?: number;
   rotation?: number;
+  style?: CSSProperties;
 }
 
 const Silk: React.FC<SilkProps> = ({
@@ -139,6 +140,7 @@ const Silk: React.FC<SilkProps> = ({
   color = "#7B7481",
   noiseIntensity = 1.5,
   rotation = 0,
+  style,
 }) => {
   const meshRef = useRef<Mesh>(null);
 
@@ -155,7 +157,7 @@ const Silk: React.FC<SilkProps> = ({
   );
 
   return (
-    <Canvas dpr={[1, 2]} frameloop="always">
+    <Canvas dpr={[1, 2]} frameloop="always" style={style}>
       <SilkPlane ref={meshRef} uniforms={uniforms} />
     </Canvas>
   );
