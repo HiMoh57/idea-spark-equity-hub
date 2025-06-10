@@ -33,6 +33,11 @@ const Navbar = () => {
                 Submit Idea
               </Link>
             )}
+            {user && (
+              <Link to="/announcements" className="text-slate-600 hover:text-slate-900 transition-colors">
+                Announcements
+              </Link>
+            )}
             <Link to="/pricing" className="text-slate-600 hover:text-slate-900 transition-colors">
               Pricing
             </Link>
