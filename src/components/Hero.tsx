@@ -37,8 +37,16 @@ const Hero = () => {
 
   return (
     <section className="relative pt-20 pb-32 px-4 sm:px-6 lg:px-8 overflow-hidden min-h-screen flex items-center">
-      {/* Enhanced background decorative elements */}
+      {/* Enhanced background with silk effect */}
       <div className="absolute inset-0 -z-10">
+        {/* Silk background */}
+        <div className="absolute inset-0 bg-gradient-to-br from-blue-50 via-purple-50 to-indigo-50">
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_120%,rgba(120,119,198,0.3),rgba(255,255,255,0))]" />
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_0%_0%,rgba(120,119,198,0.3),rgba(255,255,255,0))]" />
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_100%_0%,rgba(120,119,198,0.3),rgba(255,255,255,0))]" />
+        </div>
+
+        {/* Animated gradient orbs */}
         <motion.div 
           initial={{ opacity: 0, scale: 0.8 }}
           animate={{ opacity: 0.2, scale: 1 }}
@@ -57,6 +65,11 @@ const Hero = () => {
           transition={{ duration: 2, delay: 1, repeat: Infinity, repeatType: "reverse" }}
           className="absolute bottom-0 left-1/2 w-72 h-72 bg-indigo-300 rounded-full mix-blend-multiply filter blur-xl"
         />
+
+        {/* Silk overlay pattern */}
+        <div className="absolute inset-0 opacity-30">
+          <div className="absolute inset-0 bg-[linear-gradient(45deg,transparent_25%,rgba(68,68,68,0.2)_50%,transparent_75%,transparent_100%)] bg-[length:250%_250%,100%_100%] bg-[position:-100%_0,0_0] bg-no-repeat" />
+        </div>
       </div>
 
       <div className="max-w-7xl mx-auto w-full">
