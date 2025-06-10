@@ -3,7 +3,6 @@ import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { ArrowRight, Lightbulb, Shield, Star, Users, Plus } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import Silk from './Silk';
 
 const Hero = () => {
   const [isVisible, setIsVisible] = useState(false);
@@ -37,19 +36,7 @@ const Hero = () => {
   ];
 
   return (
-    <section className="relative pt-20 pb-32 px-4 sm:px-6 lg:px-8 overflow-hidden min-h-screen flex items-center">
-      {/* Silk background */}
-      <div className="absolute inset-0 w-full h-full -z-10 pointer-events-none">
-        <Silk
-          speed={3}
-          scale={1.5}
-          color="#6366f1"
-          noiseIntensity={1}
-          rotation={0}
-          style={{ width: '100%', height: '100%' }}
-        />
-      </div>
-
+    <section className="relative pt-20 pb-32 px-4 sm:px-6 lg:px-8 overflow-hidden min-h-screen flex items-center bg-gradient-to-b from-white to-slate-50">
       <div className="max-w-7xl mx-auto w-full">
         <AnimatePresence>
           {isVisible && (
