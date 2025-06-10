@@ -155,7 +155,6 @@ const SubmitIdea = () => {
       }
 
       // Then create the idea with file URLs
-      console.log("User ID:", user.id);
       const { error } = await supabase
         .from('ideas')
         .insert({
