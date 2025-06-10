@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -85,7 +84,7 @@ const UpiPaymentModal: React.FC<UpiPaymentModalProps> = ({
 
       toast({
         title: "Verification Submitted!",
-        description: "Your payment verification has been submitted. We'll review it shortly.",
+        description: "Your payment verification has been submitted. We'll review it and grant access within 24 hours.",
       });
 
       onPaymentSubmitted();
