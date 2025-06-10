@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -44,6 +43,7 @@ const PurchasedIdeas = () => {
           id,
           payment_amount,
           created_at,
+          status,
           ideas!inner (
             id,
             title,
@@ -59,6 +59,7 @@ const PurchasedIdeas = () => {
           )
         `)
         .eq('requester_id', user?.id)
+        .eq('status', 'approved')
         .eq('payment_verifications.verification_status', 'verified');
 
       if (error) throw error;
