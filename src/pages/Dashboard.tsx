@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { useNavigate } from 'react-router-dom';
@@ -255,14 +254,104 @@ const Dashboard = () => {
                             <p className="text-sm text-slate-500">
                               Payment Amount: ₹{(request.payment_amount / 100).toFixed(2)}
                             </p>
-                            <Badge variant={request.status === 'approved' ? 'default' : 'secondary'}>
-                              {request.status}
-                            </Badge>
+                            <div className="flex items-center gap-2 mt-2">
+                              <Badge variant={request.status === 'approved' ? 'default' : 'secondary'}>
+                                Request: {request.status}
+                              </Badge>
+                              <Badge variant={request.payment_verifications?.[0]?.verification_status === 'verified' ? 'default' : 'secondary'}>
+                                Payment: {request.payment_verifications?.[0]?.verification_status || 'pending'}
+                              </Badge>
+                            </div>
+                            {request.payment_verifications?.[0] && (
+                              <div className="mt-2 text-sm text-slate-600">
+                                <p>UPI ID: {request.payment_verifications[0].upi_id}</p>
+                                <p>Transaction ID: {request.payment_verifications[0].transaction_id}</p>
+                              </div>
+                            )}
                           </div>
                           <div className="text-xs text-slate-500">
                             {new Date(request.created_at).toLocaleDateString()}
                           </div>
                         </div>
+
+                        {request.status === 'pending' && request.payment_verifications?.[0]?.verification_status === 'pending' && (
+                          <div className="mt-4 flex gap-2">
+                            <Button
+                              onClick={async () => {
+                                try {
+                                  // Update payment verification status
+                                  const { error: verificationError } = await supabase
+                                    .from('payment_verifications')
+                                    .update({ verification_status: 'verified' })
+                                    .eq('access_request_id', request.id);
+
+                                  if (verificationError) throw verificationError;
+
+                                  // Update access request status
+                                  const { error: requestError } = await supabase
+                                    .from('access_requests')
+                                    .update({ status: 'approved' })
+                                    .eq('id', request.id);
+
+                                  if (requestError) throw requestError;
+
+                                  toast({
+                                    title: "Access Granted",
+                                    description: "Payment verified and access granted successfully."
+                                  });
+
+                                  fetchDashboardData();
+                                } catch (error: any) {
+                                  toast({
+                                    title: "Error",
+                                    description: error.message,
+                                    variant: "destructive"
+                                  });
+                                }
+                              }}
+                              className="bg-green-600 hover:bg-green-700"
+                            >
+                              Verify & Grant Access
+                            </Button>
+                            <Button
+                              onClick={async () => {
+                                try {
+                                  // Update payment verification status
+                                  const { error: verificationError } = await supabase
+                                    .from('payment_verifications')
+                                    .update({ verification_status: 'rejected' })
+                                    .eq('access_request_id', request.id);
+
+                                  if (verificationError) throw verificationError;
+
+                                  // Update access request status
+                                  const { error: requestError } = await supabase
+                                    .from('access_requests')
+                                    .update({ status: 'rejected' })
+                                    .eq('id', request.id);
+
+                                  if (requestError) throw requestError;
+
+                                  toast({
+                                    title: "Access Rejected",
+                                    description: "Payment verification rejected."
+                                  });
+
+                                  fetchDashboardData();
+                                } catch (error: any) {
+                                  toast({
+                                    title: "Error",
+                                    description: error.message,
+                                    variant: "destructive"
+                                  });
+                                }
+                              }}
+                              variant="destructive"
+                            >
+                              Reject
+                            </Button>
+                          </div>
+                        )}
                       </CardContent>
                     </Card>
                   ))
