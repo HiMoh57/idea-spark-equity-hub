@@ -14,6 +14,7 @@ import Disclaimer from "./pages/Disclaimer";
 import Pricing from "./pages/Pricing";
 import PaymentSuccess from "./pages/PaymentSuccess";
 import NotFound from "./pages/NotFound";
+import AnnouncementsPage from "./pages/AnnouncementsPage";
 import RealtimeNotifications from "./components/RealtimeNotifications";
 import { useAuth } from '@/hooks/useAuth';
 import OnboardingModal from '@/components/OnboardingModal';
@@ -41,6 +42,7 @@ const App = () => {
             <Route path="/disclaimer" element={<Disclaimer />} />
             <Route path="/pricing" element={<Pricing />} />
             <Route path="/payment-success" element={<PaymentSuccess />} />
+            <Route path="/announcements" element={<AnnouncementsPage />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
           <OnboardingModal 
