@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { ArrowRight, Lightbulb, Shield, Star, Users, Plus } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 
 const Hero = () => {
   const [isVisible, setIsVisible] = useState(false);
@@ -35,7 +36,7 @@ const Hero = () => {
   ];
 
   return (
-    <section className="relative pt-20 pb-32 px-4 sm:px-6 lg:px-8 overflow-hidden min-h-screen flex items-center bg-gradient-to-b from-white to-slate-50">
+    <section className="relative py-20 px-4 sm:px-6 lg:px-8 overflow-hidden">
       <div className="max-w-7xl mx-auto w-full">
         <AnimatePresence>
           {isVisible && (
