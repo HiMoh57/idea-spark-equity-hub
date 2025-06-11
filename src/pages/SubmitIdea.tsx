@@ -498,9 +498,9 @@ const SubmitIdea = () => {
                       <SelectValue placeholder="Select market size" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="Small">Small (Niche < ₹10 Cr)</SelectItem>
-                      <SelectItem value="Medium">Medium (₹10–100 Cr)</SelectItem>
-                      <SelectItem value="Large">Large (₹100 Cr+)</SelectItem>
+                      <SelectItem value="Small">Small (Niche < INR 10 Cr)</SelectItem>
+                      <SelectItem value="Medium">Medium (INR 10-100 Cr)</SelectItem>
+                      <SelectItem value="Large">Large (INR 100 Cr+)</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
