@@ -21,6 +21,10 @@ interface IdeaCardProps {
     created_at: string;
     creator_id: string;
     equity_percentage: number;
+    problem_description?: string;
+    validation_source?: string;
+    market_size?: string;
+    validation_methods?: string[];
   };
   showFullDescription?: boolean;
   onAccessGranted?: () => void;
@@ -208,17 +212,42 @@ const IdeaCard: React.FC<IdeaCardProps> = ({
     onAccessGranted?.();
   };
 
+  const isIdeaValidated = () => {
+    const validationFields = [
+      idea.problem_description,
+      idea.validation_source,
+      idea.market_size,
+      idea.validation_methods?.length
+    ].filter(Boolean);
+    return validationFields.length >= 2;
+  };
+
   return (
     <>
       <Card className="border-0 shadow-lg hover:shadow-xl transition-all duration-300 bg-white/80 backdrop-blur-sm group">
         <CardContent className="p-6">
           <div className="flex justify-between items-start mb-3">
-            <Badge variant="secondary" className="bg-gradient-to-r from-blue-100 to-purple-100 text-blue-700 border-0">
-              {idea.category}
-            </Badge>
-            <div className="flex items-center text-xs text-slate-500">
-              <Clock className="h-3 w-3 mr-1" />
-              {new Date(idea.created_at).toLocaleDateString()}
+            <div className="flex items-center">
+              <Badge className="bg-slate-100 text-slate-800">
+                {idea.category}
+              </Badge>
+              {isIdeaValidated() && (
+                <Badge className="bg-green-100 text-green-800">
+                  <CheckCircle className="h-3 w-3 mr-1" />
+                  Validated
+                </Badge>
+              )}
+              <div className="flex items-center text-xs text-slate-500">
+                <Clock className="h-3 w-3 mr-1" />
+                {new Date(idea.created_at).toLocaleDateString()}
+              </div>
+            </div>
+            <div className="flex flex-wrap gap-1 mt-2">
+              {idea.tags?.map((tag) => (
+                <Badge key={tag} className="bg-blue-100 text-blue-800">
+                  {tag}
+                </Badge>
+              ))}
             </div>
           </div>
 
@@ -241,14 +270,6 @@ const IdeaCard: React.FC<IdeaCardProps> = ({
               </div>
             </div>
           )}
-
-          <div className="flex flex-wrap gap-2 mb-4">
-            {idea.tags.map(tag => (
-              <Badge key={tag} variant="outline" className="text-xs">
-                {tag}
-              </Badge>
-            ))}
-          </div>
 
           <div className="flex items-center justify-between mb-4 text-sm text-slate-500">
             <div className="flex items-center">
