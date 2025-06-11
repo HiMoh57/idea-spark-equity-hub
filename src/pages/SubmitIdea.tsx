@@ -6,15 +6,32 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
-import { Lightbulb, Plus, X, AlertCircle, ArrowLeft, Upload, Shield, Lock, FileText } from 'lucide-react';
+import { Lightbulb, Plus, X, AlertCircle, ArrowLeft, Upload, Shield, Lock, FileText, Home } from 'lucide-react';
 import Navbar from '@/components/Navbar';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
 import Footer from '@/components/Footer';
 import { Slider } from '@/components/ui/slider';
 import { Checkbox } from '@/components/ui/checkbox';
+
+interface FormData {
+  title: string;
+  teaser: string;
+  description: string;
+  category: string;
+  tags: string[];
+  newTag: string;
+  equityPercentage: number;
+  equity: number;
+  attachments: File[];
+  terms: boolean;
+  problemDescription: string;
+  validationSource: string;
+  marketSize: string;
+  validationMethods: string[];
+}
 
 const SubmitIdea = () => {
   const { user, loading: authLoading } = useAuth();
@@ -24,20 +41,31 @@ const SubmitIdea = () => {
   const [submitting, setSubmitting] = useState(false);
   const [uploading, setUploading] = useState(false);
 
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<FormData>({
     title: '',
     teaser: '',
     description: '',
     category: '',
-    tags: [] as string[],
+    tags: [],
     newTag: '',
     equityPercentage: 5,
     equity: 10,
-    attachments: [] as File[],
-    terms: false
+    attachments: [],
+    terms: false,
+    problemDescription: '',
+    validationSource: '',
+    marketSize: '',
+    validationMethods: []
   });
 
   const categories = ['HealthTech', 'EdTech', 'FinTech', 'Sustainability', 'AgriTech', 'Enterprise', 'Consumer', 'AI', 'Other'];
+
+  const validationMethodOptions = [
+    "I've faced it myself",
+    "I've seen others complain about it",
+    "I've done surveys or interviews",
+    "It's a trending topic"
+  ];
 
   useEffect(() => {
     if (!authLoading && !user) {
@@ -154,7 +182,7 @@ const SubmitIdea = () => {
         fileUrls.push(publicUrl);
       }
 
-      // Then create the idea with file URLs
+      // Then create the idea with file URLs and validation fields
       const { error } = await supabase
         .from('ideas')
         .insert({
@@ -165,7 +193,11 @@ const SubmitIdea = () => {
           category: formData.category,
           tags: formData.tags,
           equity_percentage: formData.equityPercentage,
-          attachments: fileUrls
+          attachments: fileUrls,
+          problem_description: formData.problemDescription,
+          validation_source: formData.validationSource,
+          market_size: formData.marketSize,
+          validation_methods: formData.validationMethods
         });
 
       if (error) throw error;
@@ -186,7 +218,11 @@ const SubmitIdea = () => {
         equityPercentage: 5,
         equity: 10,
         attachments: [],
-        terms: false
+        terms: false,
+        problemDescription: '',
+        validationSource: '',
+        marketSize: '',
+        validationMethods: []
       });
 
       navigate('/explore');
@@ -410,19 +446,93 @@ const SubmitIdea = () => {
                           <p>By submitting your idea, you agree to our terms and conditions regarding intellectual property and equity distribution.</p>
                         </div>
                       </div>
-                      <div className="flex items-start gap-2">
-                        <Checkbox
-                          id="terms"
-                          checked={formData.terms}
-                          onCheckedChange={(checked) => setFormData({ ...formData, terms: checked as boolean })}
-                        />
-                        <Label htmlFor="terms" className="text-sm text-slate-600">
-                          I agree to the terms and conditions and confirm that I have the right to share this idea.
-                        </Label>
+                      <div className="space-y-4">
+                        <div className="flex items-center space-x-2">
+                          <Checkbox
+                            id="terms"
+                            checked={formData.terms}
+                            onCheckedChange={(checked) => setFormData({ ...formData, terms: checked as boolean })}
+                          />
+                          <Label htmlFor="terms" className="text-sm text-gray-600">
+                            I agree to the terms and conditions
+                          </Label>
+                        </div>
                       </div>
                     </div>
                   </>
                 )}
+
+                {/* Problem Description */}
+                <div className="space-y-2">
+                  <Label htmlFor="problemDescription">What problem does this idea solve?</Label>
+                  <Textarea
+                    id="problemDescription"
+                    value={formData.problemDescription}
+                    onChange={(e) => setFormData({ ...formData, problemDescription: e.target.value })}
+                    placeholder="Describe the pain point, who experiences it, and why it matters."
+                    required
+                    className="min-h-[100px]"
+                  />
+                </div>
+
+                {/* Validation Source */}
+                <div className="space-y-2">
+                  <Label htmlFor="validationSource">Add a link that shows this problem exists</Label>
+                  <Input
+                    id="validationSource"
+                    type="url"
+                    value={formData.validationSource}
+                    onChange={(e) => setFormData({ ...formData, validationSource: e.target.value })}
+                    placeholder="Paste a link to a Reddit post, tweet, article, or trend"
+                  />
+                </div>
+
+                {/* Market Size */}
+                <div className="space-y-2">
+                  <Label htmlFor="marketSize">How big is the market for this idea?</Label>
+                  <Select
+                    value={formData.marketSize}
+                    onValueChange={(value) => setFormData({ ...formData, marketSize: value })}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select market size" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Small">Small (Niche < ₹10 Cr)</SelectItem>
+                      <SelectItem value="Medium">Medium (₹10–100 Cr)</SelectItem>
+                      <SelectItem value="Large">Large (₹100 Cr+)</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {/* Validation Methods */}
+                <div className="space-y-2">
+                  <Label>How do you know this problem is real?</Label>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {validationMethodOptions.map((method) => (
+                      <div key={method} className="flex items-center space-x-2">
+                        <Checkbox
+                          id={method}
+                          checked={formData.validationMethods.includes(method)}
+                          onCheckedChange={(checked) => {
+                            if (checked) {
+                              setFormData({
+                                ...formData,
+                                validationMethods: [...formData.validationMethods, method]
+                              });
+                            } else {
+                              setFormData({
+                                ...formData,
+                                validationMethods: formData.validationMethods.filter(m => m !== method)
+                              });
+                            }
+                          }}
+                        />
+                        <Label htmlFor={method}>{method}</Label>
+                      </div>
+                    ))}
+                  </div>
+                </div>
 
                 <div className="flex justify-between pt-6">
                   {step > 1 && (
