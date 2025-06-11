@@ -90,57 +90,46 @@ const SubmitIdea = () => {
     });
   };
 
-  const validateStep1 = () => {
-    if (!formData.title.trim()) {
-      toast({
-        title: "Title Required",
-        description: "Please enter a title for your idea",
-        variant: "destructive"
-      });
-      return false;
-    }
-    if (!formData.teaser.trim()) {
-      toast({
-        title: "Teaser Required",
-        description: "Please enter a teaser for your idea",
-        variant: "destructive"
-      });
-      return false;
-    }
-    if (!formData.description.trim()) {
-      toast({
-        title: "Description Required",
-        description: "Please enter a description for your idea",
-        variant: "destructive"
-      });
-      return false;
-    }
-    if (!formData.category) {
-      toast({
-        title: "Category Required",
-        description: "Please select a category for your idea",
-        variant: "destructive"
-      });
-      return false;
-    }
-    return true;
-  };
-
-  const validateStep2 = () => {
-    if (formData.attachments.length === 0) {
-      toast({
-        title: "Attachments Required",
-        description: "Please upload at least one attachment",
-        variant: "destructive"
-      });
-      return false;
+  const validateStep = () => {
+    switch (step) {
+      case 1:
+        if (!formData.title || !formData.description || !formData.category) {
+          toast({
+            title: "Missing Information",
+            description: "Please fill in all required fields before proceeding.",
+            variant: "destructive",
+          });
+          return false;
+        }
+        break;
+      case 2:
+        if (!formData.problemDescription || !formData.validationSource || !formData.marketSize || formData.validationMethods.length === 0) {
+          toast({
+            title: "Missing Validation Information",
+            description: "Please provide all validation details to ensure your idea is well-researched.",
+            variant: "destructive",
+          });
+          return false;
+        }
+        break;
+      case 3:
+        if (!formData.terms) {
+          toast({
+            title: "Missing Information",
+            description: "Please agree to the terms and conditions before submitting.",
+            variant: "destructive",
+          });
+          return false;
+        }
+        break;
     }
     return true;
   };
 
   const handleNextStep = () => {
-    if (step === 1 && !validateStep1()) return;
-    if (step === 2 && !validateStep2()) return;
+    if (!validateStep()) {
+      return;
+    }
     setStep(step + 1);
   };
 
@@ -464,7 +453,7 @@ const SubmitIdea = () => {
 
                 {/* Problem Description */}
                 <div className="space-y-2">
-                  <Label htmlFor="problemDescription">What problem does this idea solve?</Label>
+                  <Label htmlFor="problemDescription">What problem does this idea solve? *</Label>
                   <Textarea
                     id="problemDescription"
                     value={formData.problemDescription}
@@ -477,28 +466,30 @@ const SubmitIdea = () => {
 
                 {/* Validation Source */}
                 <div className="space-y-2">
-                  <Label htmlFor="validationSource">Add a link that shows this problem exists</Label>
+                  <Label htmlFor="validationSource">Add a link that shows this problem exists *</Label>
                   <Input
                     id="validationSource"
                     type="url"
                     value={formData.validationSource}
                     onChange={(e) => setFormData({ ...formData, validationSource: e.target.value })}
                     placeholder="Paste a link to a Reddit post, tweet, article, or trend"
+                    required
                   />
                 </div>
 
                 {/* Market Size */}
                 <div className="space-y-2">
-                  <Label htmlFor="marketSize">How big is the market for this idea?</Label>
+                  <Label htmlFor="marketSize">How big is the market for this idea? *</Label>
                   <Select
                     value={formData.marketSize}
                     onValueChange={(value) => setFormData({ ...formData, marketSize: value })}
+                    required
                   >
                     <SelectTrigger>
                       <SelectValue placeholder="Select market size" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="Small">Small (Niche Market)</SelectItem>
+                      <SelectItem value="Small">Small Market</SelectItem>
                       <SelectItem value="Medium">Medium Market</SelectItem>
                       <SelectItem value="Large">Large Market</SelectItem>
                     </SelectContent>
@@ -507,7 +498,7 @@ const SubmitIdea = () => {
 
                 {/* Validation Methods */}
                 <div className="space-y-2">
-                  <Label>How do you know this problem is real?</Label>
+                  <Label>How do you know this problem is real? *</Label>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {validationMethodOptions.map((method) => (
                       <div key={method} className="flex items-center space-x-2">
