@@ -20,6 +20,10 @@ interface PurchasedIdea {
   access_granted_at: string;
   payment_amount: number;
   verification_status: string;
+  problem_description?: string;
+  validation_source?: string;
+  market_size?: string;
+  validation_methods?: string[];
 }
 
 const PurchasedIdeas = () => {
@@ -52,7 +56,11 @@ const PurchasedIdeas = () => {
             category,
             tags,
             equity_percentage,
-            creator_id
+            creator_id,
+            problem_description,
+            validation_source,
+            market_size,
+            validation_methods
           ),
           payment_verifications (
             verification_status
@@ -75,7 +83,11 @@ const PurchasedIdeas = () => {
         creator_id: item.ideas.creator_id,
         access_granted_at: item.created_at,
         payment_amount: item.payment_amount,
-        verification_status: item.payment_verifications?.[0]?.verification_status || 'pending'
+        verification_status: item.payment_verifications?.[0]?.verification_status || 'pending',
+        problem_description: item.ideas.problem_description,
+        validation_source: item.ideas.validation_source,
+        market_size: item.ideas.market_size,
+        validation_methods: item.ideas.validation_methods
       })) || [];
 
       setPurchasedIdeas(formattedIdeas);
@@ -128,6 +140,45 @@ const PurchasedIdeas = () => {
                   <h4 className="font-medium text-green-900 mb-2">Full Description</h4>
                   <p className="text-sm text-green-800">{idea.description}</p>
                 </div>
+                
+                {idea.problem_description && (
+                  <div className="bg-blue-50 p-3 rounded-lg">
+                    <h4 className="font-medium text-blue-900 mb-2">Problem Description</h4>
+                    <p className="text-sm text-blue-800">{idea.problem_description}</p>
+                  </div>
+                )}
+
+                {idea.validation_source && (
+                  <div className="bg-blue-50 p-3 rounded-lg">
+                    <h4 className="font-medium text-blue-900 mb-2">Validation Source</h4>
+                    <a 
+                      href={idea.validation_source} 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="text-sm text-blue-600 hover:text-blue-800 break-all"
+                    >
+                      {idea.validation_source}
+                    </a>
+                  </div>
+                )}
+
+                {idea.market_size && (
+                  <div className="bg-blue-50 p-3 rounded-lg">
+                    <h4 className="font-medium text-blue-900 mb-2">Market Size</h4>
+                    <p className="text-sm text-blue-800">{idea.market_size}</p>
+                  </div>
+                )}
+
+                {idea.validation_methods && idea.validation_methods.length > 0 && (
+                  <div className="bg-blue-50 p-3 rounded-lg">
+                    <h4 className="font-medium text-blue-900 mb-2">Validation Methods</h4>
+                    <ul className="text-sm text-blue-800 list-disc list-inside">
+                      {idea.validation_methods.map((method, index) => (
+                        <li key={index}>{method}</li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
                 
                 <div className="flex flex-wrap gap-1">
                   {idea.tags.map((tag, index) => (
