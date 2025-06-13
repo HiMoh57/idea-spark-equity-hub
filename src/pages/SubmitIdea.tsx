@@ -358,15 +358,22 @@ const SubmitIdea = () => {
                       />
                     </div>
                     <div>
-                      <Label htmlFor="marketSize">Market Size</Label>
-                      <Input
-                        id="marketSize"
-                        value={formData.marketSize}
-                        onChange={(e) => setFormData({ ...formData, marketSize: e.target.value })}
-                        placeholder="Estimated market size"
-                        required
-                      />
-                    </div>
+  <Label htmlFor="marketSize">Market Size</Label>
+  <Select
+    value={formData.marketSize}
+    onValueChange={(value) => setFormData({ ...formData, marketSize: value })}
+    required
+  >
+    <SelectTrigger>
+      <SelectValue placeholder="Select market size" />
+    </SelectTrigger>
+    <SelectContent>
+      <SelectItem value="Small">Small (Niche Market)</SelectItem>
+      <SelectItem value="Medium">Medium Market</SelectItem>
+      <SelectItem value="Large">Large Market</SelectItem>
+    </SelectContent>
+  </Select>
+</div>
                     <div>
                       <Label>Validation Methods</Label>
                       <div className="space-y-2">
