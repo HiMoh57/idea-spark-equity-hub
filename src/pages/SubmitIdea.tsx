@@ -262,7 +262,7 @@ const SubmitIdea = () => {
                         id="title"
                         value={formData.title}
                         onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                        placeholder="Enter the title of your idea"
+                        placeholder="Enter the title of your idea that will be visible publicly."
                         required
                       />
                     </div>
@@ -272,7 +272,7 @@ const SubmitIdea = () => {
                         id="teaser"
                         value={formData.teaser}
                         onChange={(e) => setFormData({ ...formData, teaser: e.target.value })}
-                        placeholder="A brief teaser for your idea"
+                        placeholder="A brief teaser for your idea that will be visible publicly."
                         required
                       />
                     </div>
@@ -282,7 +282,7 @@ const SubmitIdea = () => {
                         id="description"
                         value={formData.description}
                         onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                        placeholder="Describe your idea in detail"
+                        placeholder="Describe your idea in detail. Your idea will be locked🔒 and will only be accessible after someone pays which means that your idea is secure with us. "
                         required
                       />
                     </div>
@@ -290,7 +290,7 @@ const SubmitIdea = () => {
                       <Label htmlFor="category">Category</Label>
                       <Select value={formData.category} onValueChange={(value) => setFormData({ ...formData, category: value })}>
                         <SelectTrigger>
-                          <SelectValue placeholder="Select a category" />
+                          <SelectValue placeholder="Select a category that best suits you idea." />
                         </SelectTrigger>
                         <SelectContent>
                           {categories.map(category => (
