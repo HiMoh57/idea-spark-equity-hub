@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -36,7 +35,8 @@ const Auth = () => {
     setLoading(true);
 
     try {
-      const { error } = await supabase.auth.signUp({
+      // Sign up without email confirmation
+      const { data, error } = await supabase.auth.signUp({
         email,
         password,
         options: {
@@ -50,10 +50,20 @@ const Auth = () => {
 
       if (error) throw error;
 
+      // Sign in immediately after signup
+      const { error: signInError } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+
+      if (signInError) throw signInError;
+
       toast({
         title: "Account created!",
-        description: "Please check your email to verify your account.",
+        description: "Welcome to IdeaSpark!",
       });
+
+      navigate('/');
     } catch (error: any) {
       toast({
         title: "Error",
