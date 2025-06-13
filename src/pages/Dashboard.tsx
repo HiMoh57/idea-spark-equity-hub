@@ -198,37 +198,31 @@ const Dashboard = () => {
                       <CardContent className="p-6">
                         <div className="flex justify-between items-start mb-4">
                           <div className="flex-1">
-                            <div className="flex items-center gap-2 mb-2">
-                              <h3 className="text-xl font-semibold text-slate-900">{idea.title}</h3>
-                              <Badge variant={idea.status === 'approved' ? 'default' : 
-                                            idea.status === 'rejected' ? 'destructive' : 'secondary'}>
-                                {idea.status}
-                              </Badge>
-                            </div>
-                            <p className="text-slate-600 mb-3">{idea.teaser}</p>
-                            <div className="flex items-center gap-4 text-sm text-slate-500">
-                              <div className="flex items-center">
-                                <Eye className="h-4 w-4 mr-1" />
-                                {idea.views} views
-                              </div>
-                              <div className="flex items-center">
-                                <Heart className="h-4 w-4 mr-1" />
-                                {idea.interests} interests
-                              </div>
-                              <Badge variant="outline">{idea.category}</Badge>
-                            </div>
+                            <h3 className="text-xl font-semibold text-slate-900">{idea.title}</h3>
+                            <p className="text-slate-600 mt-1">{idea.teaser}</p>
                           </div>
-                          <div className="flex gap-2">
-                            <Button variant="outline" size="sm">
+                          <div className="flex items-center gap-2">
+                            <Badge variant="outline">{idea.category}</Badge>
+                            <Button variant="ghost" size="icon" onClick={() => navigate(`/edit-idea/${idea.id}`)}>
                               <Edit className="h-4 w-4" />
                             </Button>
-                            <Button 
-                              variant="outline" 
-                              size="sm" 
-                              onClick={() => deleteIdea(idea.id)}
-                            >
+                            <Button variant="ghost" size="icon" onClick={() => deleteIdea(idea.id)}>
                               <Trash2 className="h-4 w-4" />
                             </Button>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-4 text-sm text-slate-500">
+                          <div className="flex items-center gap-1">
+                            <Eye className="h-4 w-4" />
+                            <span>{idea.views} views</span>
+                          </div>
+                          <div className="flex items-center gap-1">
+                            <Heart className="h-4 w-4" />
+                            <span>{idea.interests} interests</span>
+                          </div>
+                          <div className="flex items-center gap-1">
+                            <DollarSign className="h-4 w-4" />
+                            <span>{idea.equity_percentage}% equity</span>
                           </div>
                         </div>
                       </CardContent>
@@ -246,112 +240,19 @@ const Dashboard = () => {
                   </Card>
                 ) : (
                   accessRequests.map((request: any) => (
-                    <Card key={request.id}>
+                    <Card key={request.id} className="hover:shadow-lg transition-shadow">
                       <CardContent className="p-6">
-                        <div className="flex justify-between items-start">
-                          <div>
-                            <h4 className="font-semibold">{request.ideas.title}</h4>
-                            <p className="text-sm text-slate-500">
-                              Payment Amount: ₹{(request.payment_amount / 100).toFixed(2)}
-                            </p>
-                            <div className="flex items-center gap-2 mt-2">
-                              <Badge variant={request.status === 'approved' ? 'default' : 'secondary'}>
-                                Request: {request.status}
-                              </Badge>
-                              <Badge variant={request.payment_verifications?.[0]?.verification_status === 'verified' ? 'default' : 'secondary'}>
-                                Payment: {request.payment_verifications?.[0]?.verification_status || 'pending'}
-                              </Badge>
-                            </div>
-                            {request.payment_verifications?.[0] && (
-                              <div className="mt-2 text-sm text-slate-600">
-                                <p>UPI ID: {request.payment_verifications[0].upi_id}</p>
-                                <p>Transaction ID: {request.payment_verifications[0].transaction_id}</p>
-                              </div>
-                            )}
+                        <div className="flex justify-between items-start mb-4">
+                          <div className="flex-1">
+                            <h3 className="text-xl font-semibold text-slate-900">{request.ideas.title}</h3>
+                            <p className="text-slate-600 mt-1">Requested by: {request.executor_id}</p>
                           </div>
-                          <div className="text-xs text-slate-500">
-                            {new Date(request.created_at).toLocaleDateString()}
+                          <div className="flex items-center gap-2">
+                            <Button variant="outline" size="sm" onClick={() => navigate(`/view-request/${request.id}`)}>
+                              View Details
+                            </Button>
                           </div>
                         </div>
-
-                        {request.status === 'pending' && request.payment_verifications?.[0]?.verification_status === 'pending' && (
-                          <div className="mt-4 flex gap-2">
-                            <Button
-                              onClick={async () => {
-                                try {
-                                  // Update payment verification status
-                                  const { error: verificationError } = await supabase
-                                    .from('payment_verifications')
-                                    .update({ verification_status: 'verified' })
-                                    .eq('access_request_id', request.id);
-
-                                  if (verificationError) throw verificationError;
-
-                                  // Update access request status
-                                  const { error: requestError } = await supabase
-                                    .from('access_requests')
-                                    .update({ status: 'approved' })
-                                    .eq('id', request.id);
-
-                                  if (requestError) throw requestError;
-
-                                  toast({
-                                    title: "Access Granted",
-                                    description: "Payment verified and access granted successfully."
-                                  });
-
-                                  fetchDashboardData();
-                                } catch (error: any) {
-                                  toast({
-                                    title: "Error",
-                                    description: error.message,
-                                    variant: "destructive"
-                                  });
-                                }
-                              }}
-                              className="bg-green-600 hover:bg-green-700"
-                            >
-                              Verify & Grant Access
-                            </Button>
-                            <Button
-                              onClick={async () => {
-                                try {
-                                  // Update payment verification status
-                                  const { error: verificationError } = await supabase
-                                    .from('payment_verifications')
-                                    .update({ verification_status: 'rejected' })
-                                    .eq('access_request_id', request.id);
-
-                                  if (verificationError) throw verificationError;
-
-                                  // Update access request status
-                                  const { error: requestError } = await supabase
-                                    .from('access_requests')
-                                    .update({ status: 'rejected' })
-                                    .eq('id', request.id);
-
-                                  if (requestError) throw requestError;
-
-                                  toast({
-                                    title: "Access Rejected",
-                                    description: "Payment verification rejected."
-                                  });
-
-                                  fetchDashboardData();
-                                } catch (error: any) {
-                                  toast({
-                                    title: "Error",
-                                    description: error.message,
-                                    variant: "destructive"
-                                  });
-                                }
-                              }}
-                              variant="destructive"
-                            >
-                              Reject
-                            </Button>
-                          </div>
-                        )}
                       </CardContent>
                     </Card>
                   ))
@@ -362,35 +263,24 @@ const Dashboard = () => {
                 {proposals.length === 0 ? (
                   <Card>
                     <CardContent className="text-center py-8">
-                      <p className="text-slate-500">No collaboration proposals yet.</p>
+                      <p className="text-slate-500">No proposals yet.</p>
                     </CardContent>
                   </Card>
                 ) : (
                   proposals.map((proposal: any) => (
-                    <Card key={proposal.id}>
+                    <Card key={proposal.id} className="hover:shadow-lg transition-shadow">
                       <CardContent className="p-6">
                         <div className="flex justify-between items-start mb-4">
-                          <div>
-                            <h4 className="font-semibold">{proposal.title}</h4>
-                            <p className="text-sm text-slate-600 mb-2">{proposal.ideas.title}</p>
-                            <p className="text-sm text-slate-500">
-                              From: {proposal.profiles?.full_name || 'Anonymous'}
-                            </p>
-                            <p className="text-sm text-slate-500">
-                              Proposed Equity: {proposal.proposed_equity}%
-                            </p>
+                          <div className="flex-1">
+                            <h3 className="text-xl font-semibold text-slate-900">{proposal.ideas.title}</h3>
+                            <p className="text-slate-600 mt-1">Proposed by: {proposal.profiles.full_name}</p>
                           </div>
-                          <Badge variant={proposal.status === 'accepted' ? 'default' : 'secondary'}>
-                            {proposal.status}
-                          </Badge>
+                          <div className="flex items-center gap-2">
+                            <Button variant="outline" size="sm" onClick={() => navigate(`/view-proposal/${proposal.id}`)}>
+                              View Details
+                            </Button>
+                          </div>
                         </div>
-                        <p className="text-slate-600 mb-3">{proposal.description}</p>
-                        {proposal.status === 'pending' && (
-                          <div className="flex gap-2">
-                            <Button size="sm">Accept</Button>
-                            <Button variant="outline" size="sm">Reject</Button>
-                          </div>
-                        )}
                       </CardContent>
                     </Card>
                   ))
@@ -406,24 +296,17 @@ const Dashboard = () => {
                   </Card>
                 ) : (
                   notifications.map((notification: any) => (
-                    <Card 
-                      key={notification.id}
-                      className={`cursor-pointer transition-colors ${
-                        !notification.read_at ? 'bg-blue-50 border-blue-200' : ''
-                      }`}
-                      onClick={() => !notification.read_at && markNotificationAsRead(notification.id)}
-                    >
-                      <CardContent className="p-4">
-                        <div className="flex items-start gap-3">
-                          <Bell className={`h-5 w-5 mt-0.5 ${
-                            !notification.read_at ? 'text-blue-600' : 'text-slate-400'
-                          }`} />
+                    <Card key={notification.id} className="hover:shadow-lg transition-shadow">
+                      <CardContent className="p-6">
+                        <div className="flex justify-between items-start mb-4">
                           <div className="flex-1">
-                            <h4 className="font-medium">{notification.title}</h4>
-                            <p className="text-sm text-slate-600">{notification.message}</p>
-                            <p className="text-xs text-slate-500 mt-1">
-                              {new Date(notification.created_at).toLocaleString()}
-                            </p>
+                            <h3 className="text-xl font-semibold text-slate-900">{notification.title}</h3>
+                            <p className="text-slate-600 mt-1">{notification.message}</p>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <Button variant="outline" size="sm" onClick={() => markNotificationAsRead(notification.id)}>
+                              Mark as Read
+                            </Button>
                           </div>
                         </div>
                       </CardContent>
@@ -460,24 +343,17 @@ const Dashboard = () => {
                   </Card>
                 ) : (
                   notifications.map((notification: any) => (
-                    <Card 
-                      key={notification.id}
-                      className={`cursor-pointer transition-colors ${
-                        !notification.read_at ? 'bg-blue-50 border-blue-200' : ''
-                      }`}
-                      onClick={() => !notification.read_at && markNotificationAsRead(notification.id)}
-                    >
-                      <CardContent className="p-4">
-                        <div className="flex items-start gap-3">
-                          <Bell className={`h-5 w-5 mt-0.5 ${
-                            !notification.read_at ? 'text-blue-600' : 'text-slate-400'
-                          }`} />
+                    <Card key={notification.id} className="hover:shadow-lg transition-shadow">
+                      <CardContent className="p-6">
+                        <div className="flex justify-between items-start mb-4">
                           <div className="flex-1">
-                            <h4 className="font-medium">{notification.title}</h4>
-                            <p className="text-sm text-slate-600">{notification.message}</p>
-                            <p className="text-xs text-slate-500 mt-1">
-                              {new Date(notification.created_at).toLocaleString()}
-                            </p>
+                            <h3 className="text-xl font-semibold text-slate-900">{notification.title}</h3>
+                            <p className="text-slate-600 mt-1">{notification.message}</p>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <Button variant="outline" size="sm" onClick={() => markNotificationAsRead(notification.id)}>
+                              Mark as Read
+                            </Button>
                           </div>
                         </div>
                       </CardContent>
