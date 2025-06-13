@@ -213,8 +213,7 @@ const SubmitIdea = () => {
         marketSize: '',
         validationMethods: []
       });
-
-      navigate('/explore');
+      setStep(1);
     } catch (error: any) {
       toast({
         title: "Error submitting idea",
@@ -241,325 +240,190 @@ const SubmitIdea = () => {
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
       <Navbar />
       
-      <main className="py-20 px-4 sm:px-6 lg:px-8">
+      <div className="pt-20 pb-12 px-4 sm:px-6 lg:px-8">
         <div className="max-w-3xl mx-auto">
-          {/* Progress Steps */}
-          <div className="mb-8">
-            <div className="flex items-center justify-between">
-              {[1, 2, 3].map((stepNumber) => (
-                <div key={stepNumber} className="flex items-center">
-                  <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
-                    step >= stepNumber ? 'bg-blue-600 text-white' : 'bg-slate-200 text-slate-600'
-                  }`}>
-                    {stepNumber}
-                  </div>
-                  {stepNumber < 3 && (
-                    <div className={`w-24 h-1 ${
-                      step > stepNumber ? 'bg-blue-600' : 'bg-slate-200'
-                    }`} />
-                  )}
-                </div>
-              ))}
-            </div>
+          <div className="text-center mb-12">
+            <h1 className="text-4xl font-bold text-slate-900 mb-4">
+              Submit Your Idea
+            </h1>
+            <p className="text-xl text-slate-600 max-w-2xl mx-auto">
+              Share your innovative concept with the world. Let's turn your vision into reality.
+            </p>
           </div>
 
-          <Card className="shadow-lg">
-            <CardHeader>
-              <div className="flex items-center gap-4 mb-2">
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => navigate(-1)}
-                  className="rounded-full"
-                >
-                  <ArrowLeft className="h-5 w-5" />
-                </Button>
-                <h1 className="text-2xl font-bold text-slate-900">
-                  {step === 1 ? "Basic Information" : step === 2 ? "Details & Equity" : "Review & Submit"}
-                </h1>
-              </div>
-              <p className="text-slate-600">
-                {step === 1 ? "Tell us about your idea" : 
-                 step === 2 ? "Set your equity terms and add details" : 
-                 "Review your submission before finalizing"}
-              </p>
-            </CardHeader>
-            <CardContent>
-              <form onSubmit={handleSubmit} className="space-y-6">
+          <Card className="border-0 shadow-lg bg-white/80 backdrop-blur-sm">
+            <CardContent className="p-6">
+              <form onSubmit={handleSubmit}>
                 {step === 1 && (
-                  <>
-                    <div className="space-y-4">
-                      <div>
-                        <Label htmlFor="title">Idea Title</Label>
+                  <div className="space-y-6">
+                    <div>
+                      <Label htmlFor="title">Title</Label>
+                      <Input
+                        id="title"
+                        value={formData.title}
+                        onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                        placeholder="Enter the title of your idea"
+                        required
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="teaser">Teaser</Label>
+                      <Input
+                        id="teaser"
+                        value={formData.teaser}
+                        onChange={(e) => setFormData({ ...formData, teaser: e.target.value })}
+                        placeholder="A brief teaser for your idea"
+                        required
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="description">Description</Label>
+                      <Textarea
+                        id="description"
+                        value={formData.description}
+                        onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                        placeholder="Describe your idea in detail"
+                        required
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="category">Category</Label>
+                      <Select value={formData.category} onValueChange={(value) => setFormData({ ...formData, category: value })}>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select a category" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {categories.map(category => (
+                            <SelectItem key={category} value={category}>{category}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div>
+                      <Label htmlFor="tags">Tags</Label>
+                      <div className="flex gap-2">
                         <Input
-                          id="title"
-                          value={formData.title}
-                          onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                          placeholder="Enter a clear, concise title"
-                          required
+                          id="tags"
+                          value={formData.newTag}
+                          onChange={(e) => setFormData({ ...formData, newTag: e.target.value })}
+                          placeholder="Add a tag"
                         />
+                        <Button type="button" onClick={handleAddTag}>Add</Button>
                       </div>
-                      <div>
-                        <Label htmlFor="teaser">Public Teaser (One-liner)</Label>
-                        <Input
-                          id="teaser"
-                          value={formData.teaser}
-                          onChange={(e) => setFormData({...formData, teaser: e.target.value})}
-                          placeholder="A brief, exciting description visible to everyone"
-                          required
-                          className="mt-1"
-                          maxLength={120}
-                        />
-                        <p className="text-xs text-slate-500 mt-1">{formData.teaser.length}/120 characters</p>
-                      </div>
-                      <div>
-                        <Label htmlFor="description">Full Description (Protected)</Label>
-                        <Textarea
-                          id="description"
-                          value={formData.description}
-                          onChange={(e) => setFormData({...formData, description: e.target.value})}
-                          placeholder="Detailed description of your idea, market opportunity, potential implementation, etc. This will only be visible to users who pay for access."
-                          required
-                          className="mt-1 min-h-[200px]"
-                        />
-                        <div className="flex items-center mt-2 text-xs text-amber-600">
-                          <AlertCircle className="h-3 w-3 mr-1" />
-                          This detailed description will be protected and only shown to verified users who pay for access.
-                        </div>
-                      </div>
-                      <div>
-                        <Label htmlFor="category">Category</Label>
-                        <Select
-                          value={formData.category}
-                          onValueChange={(value) => setFormData({ ...formData, category: value })}
-                        >
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select a category" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {categories.map((category) => (
-                              <SelectItem key={category} value={category}>
-                                {category}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
+                      <div className="flex flex-wrap gap-2 mt-2">
+                        {formData.tags.map(tag => (
+                          <Badge key={tag} variant="secondary">
+                            {tag}
+                            <X className="h-3 w-3 ml-1" onClick={() => handleRemoveTag(tag)} />
+                          </Badge>
+                        ))}
                       </div>
                     </div>
-                  </>
+                    <div>
+                      <Label htmlFor="equityPercentage">Equity Percentage</Label>
+                      <Slider
+                        id="equityPercentage"
+                        value={[formData.equityPercentage]}
+                        onValueChange={(value) => setFormData({ ...formData, equityPercentage: value[0] })}
+                        min={5}
+                        max={15}
+                        step={1}
+                      />
+                      <p className="text-sm text-slate-600">{formData.equityPercentage}%</p>
+                    </div>
+                    <Button type="button" onClick={handleNextStep}>Next</Button>
+                  </div>
                 )}
 
                 {step === 2 && (
-                  <>
-                    <div className="space-y-4">
-                      <div>
-                        <Label>Equity Offer</Label>
-                        <div className="mt-2">
-                          <Slider
-                            value={[formData.equity]}
-                            onValueChange={(value) => setFormData({ ...formData, equity: value[0] })}
-                            min={5}
-                            max={15}
-                            step={1}
-                            className="mb-4"
-                          />
-                          <div className="text-center text-2xl font-bold text-blue-600">
-                            {formData.equity}%
+                  <div className="space-y-6">
+                    <div>
+                      <Label htmlFor="problemDescription">Problem Description</Label>
+                      <Textarea
+                        id="problemDescription"
+                        value={formData.problemDescription}
+                        onChange={(e) => setFormData({ ...formData, problemDescription: e.target.value })}
+                        placeholder="Describe the problem your idea solves"
+                        required
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="validationSource">Validation Source</Label>
+                      <Input
+                        id="validationSource"
+                        value={formData.validationSource}
+                        onChange={(e) => setFormData({ ...formData, validationSource: e.target.value })}
+                        placeholder="How did you validate this problem?"
+                        required
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="marketSize">Market Size</Label>
+                      <Input
+                        id="marketSize"
+                        value={formData.marketSize}
+                        onChange={(e) => setFormData({ ...formData, marketSize: e.target.value })}
+                        placeholder="Estimated market size"
+                        required
+                      />
+                    </div>
+                    <div>
+                      <Label>Validation Methods</Label>
+                      <div className="space-y-2">
+                        {validationMethodOptions.map(method => (
+                          <div key={method} className="flex items-center space-x-2">
+                            <Checkbox
+                              id={method}
+                              checked={formData.validationMethods.includes(method)}
+                              onCheckedChange={(checked) => {
+                                if (checked) {
+                                  setFormData({ ...formData, validationMethods: [...formData.validationMethods, method] });
+                                } else {
+                                  setFormData({ ...formData, validationMethods: formData.validationMethods.filter(m => m !== method) });
+                                }
+                              }}
+                            />
+                            <Label htmlFor={method}>{method}</Label>
                           </div>
-                        </div>
-                      </div>
-                      <div>
-                        <Label>Attachments (Required)</Label>
-                        <div className="mt-2 border-2 border-dashed border-slate-200 rounded-lg p-6 text-center">
-                          <Upload className="h-8 w-8 text-slate-400 mx-auto mb-2" />
-                          <p className="text-sm text-slate-600">
-                            Drag and drop files here, or click to select files
-                          </p>
-                          <input
-                            type="file"
-                            multiple
-                            className="hidden"
-                            id="file-upload"
-                            onChange={(e) => handleFileUpload(e.target.files)}
-                          />
-                          <Button
-                            type="button"
-                            variant="outline"
-                            className="mt-4"
-                            onClick={() => document.getElementById('file-upload')?.click()}
-                          >
-                            Select Files
-                          </Button>
-                        </div>
-                        {formData.attachments.length > 0 && (
-                          <div className="mt-4 space-y-2">
-                            {formData.attachments.map((file, index) => (
-                              <div key={index} className="flex items-center justify-between bg-slate-50 p-2 rounded">
-                                <span className="text-sm truncate">{file.name}</span>
-                                <Button
-                                  type="button"
-                                  variant="ghost"
-                                  size="sm"
-                                  onClick={() => {
-                                    setFormData(prev => ({
-                                      ...prev,
-                                      attachments: prev.attachments.filter((_, i) => i !== index)
-                                    }));
-                                  }}
-                                >
-                                  <X className="h-4 w-4" />
-                                </Button>
-                              </div>
-                            ))}
-                          </div>
-                        )}
+                        ))}
                       </div>
                     </div>
-                  </>
+                    <Button type="button" onClick={handleNextStep}>Next</Button>
+                  </div>
                 )}
 
                 {step === 3 && (
-                  <>
-                    <div className="space-y-6">
-                      <div className="bg-slate-50 p-4 rounded-lg">
-                        <h3 className="font-semibold mb-2">Security & Privacy</h3>
-                        <div className="flex items-start gap-2 text-sm text-slate-600">
-                          <Shield className="h-5 w-5 text-green-500 flex-shrink-0 mt-0.5" />
-                          <p>Your idea is protected by our secure platform and will only be visible to approved executors.</p>
-                        </div>
-                      </div>
-                      <div className="bg-slate-50 p-4 rounded-lg">
-                        <h3 className="font-semibold mb-2">Terms & Conditions</h3>
-                        <div className="flex items-start gap-2 text-sm text-slate-600">
-                          <FileText className="h-5 w-5 text-blue-500 flex-shrink-0 mt-0.5" />
-                          <p>By submitting your idea, you agree to our terms and conditions regarding intellectual property and equity distribution.</p>
-                        </div>
-                      </div>
-                      <div className="space-y-4">
-                        <div className="flex items-center space-x-2">
-                          <Checkbox
-                            id="terms"
-                            checked={formData.terms}
-                            onCheckedChange={(checked) => setFormData({ ...formData, terms: checked as boolean })}
-                          />
-                          <Label htmlFor="terms" className="text-sm text-gray-600">
-                            I agree to the terms and conditions
-                          </Label>
-                        </div>
+                  <div className="space-y-6">
+                    <div>
+                      <Label htmlFor="attachments">Attachments</Label>
+                      <Input
+                        id="attachments"
+                        type="file"
+                        multiple
+                        onChange={(e) => handleFileUpload(e.target.files)}
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="terms">Terms and Conditions</Label>
+                      <div className="flex items-center space-x-2">
+                        <Checkbox
+                          id="terms"
+                          checked={formData.terms}
+                          onCheckedChange={(checked) => setFormData({ ...formData, terms: checked as boolean })}
+                        />
+                        <Label htmlFor="terms">I agree to the terms and conditions</Label>
                       </div>
                     </div>
-                  </>
-                )}
-
-                {/* Problem Description */}
-                <div className="space-y-2">
-                  <Label htmlFor="problemDescription">What problem does this idea solve? *</Label>
-                  <Textarea
-                    id="problemDescription"
-                    value={formData.problemDescription}
-                    onChange={(e) => setFormData({ ...formData, problemDescription: e.target.value })}
-                    placeholder="Describe the pain point, who experiences it, and why it matters."
-                    required
-                    className="min-h-[100px]"
-                  />
-                </div>
-
-                {/* Validation Source */}
-                <div className="space-y-2">
-                  <Label htmlFor="validationSource">Add a link that shows this problem exists *</Label>
-                  <Input
-                    id="validationSource"
-                    type="url"
-                    value={formData.validationSource}
-                    onChange={(e) => setFormData({ ...formData, validationSource: e.target.value })}
-                    placeholder="Paste a link to a Reddit post, tweet, article, or trend"
-                    required
-                  />
-                </div>
-
-                {/* Market Size */}
-                <div className="space-y-2">
-                  <Label htmlFor="marketSize">How big is the market for this idea? *</Label>
-                  <Select
-                    value={formData.marketSize}
-                    onValueChange={(value) => setFormData({ ...formData, marketSize: value })}
-                    required
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select market size" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="Small">Small Market</SelectItem>
-                      <SelectItem value="Medium">Medium Market</SelectItem>
-                      <SelectItem value="Large">Large Market</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                {/* Validation Methods */}
-                <div className="space-y-2">
-                  <Label>How do you know this problem is real? *</Label>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {validationMethodOptions.map((method) => (
-                      <div key={method} className="flex items-center space-x-2">
-                        <Checkbox
-                          id={method}
-                          checked={formData.validationMethods.includes(method)}
-                          onCheckedChange={(checked) => {
-                            if (checked) {
-                              setFormData({
-                                ...formData,
-                                validationMethods: [...formData.validationMethods, method]
-                              });
-                            } else {
-                              setFormData({
-                                ...formData,
-                                validationMethods: formData.validationMethods.filter(m => m !== method)
-                              });
-                            }
-                          }}
-                        />
-                        <Label htmlFor={method}>{method}</Label>
-                      </div>
-                    ))}
+                    <Button type="submit" disabled={submitting || uploading}>
+                      {submitting ? 'Submitting...' : 'Submit Idea'}
+                    </Button>
                   </div>
-                </div>
-
-                <div className="flex justify-between pt-6">
-                  {step > 1 && (
-                    <Button
-                      type="button"
-                      variant="outline"
-                      onClick={() => setStep(step - 1)}
-                    >
-                      Back
-                    </Button>
-                  )}
-                  {step < 3 ? (
-                    <Button
-                      type="button"
-                      onClick={handleNextStep}
-                      className="ml-auto"
-                    >
-                      Continue
-                    </Button>
-                  ) : (
-                    <Button
-                      type="submit"
-                      className="ml-auto"
-                      disabled={!formData.terms || submitting || uploading}
-                    >
-                      {submitting || uploading ? "Submitting..." : "Submit Idea"}
-                    </Button>
-                  )}
-                </div>
+                )}
               </form>
             </CardContent>
           </Card>
         </div>
-      </main>
-
-      <Footer />
+      </div>
     </div>
   );
 };
