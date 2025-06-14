@@ -18,6 +18,9 @@ import NotFound from "./pages/NotFound";
 import AnnouncementsPage from "./pages/AnnouncementsPage";
 import HowItWorks from "./pages/HowItWorks";
 import AboutUs from "./pages/AboutUs";
+import ViewRequest from "./pages/ViewRequest";
+import EditIdea from "./pages/EditIdea";
+import ViewProposal from "./pages/ViewProposal";
 import RealtimeNotifications from "./components/RealtimeNotifications";
 import { useAuth } from '@/hooks/useAuth';
 import OnboardingModal from '@/components/OnboardingModal';
@@ -42,6 +45,9 @@ const App = () => {
             <Route path="/how-it-works" element={<HowItWorks />} />
             <Route path="/about-us" element={<AboutUs />} />
             <Route path="/submit-idea" element={<SubmitIdea />} />
+            <Route path="/edit-idea/:id" element={<EditIdea />} />
+            <Route path="/view-request/:id" element={<ViewRequest />} />
+            <Route path="/view-proposal/:id" element={<ViewProposal />} />
             <Route path="/terms" element={<Terms />} />
             <Route path="/privacy" element={<Privacy />} />
             <Route path="/disclaimer" element={<Disclaimer />} />
