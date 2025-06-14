@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -38,7 +37,6 @@ const Navbar = () => {
               <span className="text-2xl font-bold bg-gradient-to-r from-slate-900 to-slate-700 bg-clip-text text-transparent tracking-tight">
                 IdeoPark
               </span>
-              <span className="text-xs text-slate-500 font-medium -mt-1">Silicon Valley</span>
             </div>
           </Link>
           
