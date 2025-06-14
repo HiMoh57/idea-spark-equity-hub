@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -25,6 +24,7 @@ interface PurchasedIdea {
   validation_source?: string;
   market_size?: string;
   validation_methods?: string[];
+  attachments?: string[];
 }
 
 const PurchasedIdeas = () => {
@@ -69,7 +69,8 @@ const PurchasedIdeas = () => {
             problem_description,
             validation_source,
             market_size,
-            validation_methods
+            validation_methods,
+            attachments
           )
         `)
         .eq('requester_id', user?.id)
@@ -105,7 +106,8 @@ const PurchasedIdeas = () => {
         problem_description: item.ideas.problem_description,
         validation_source: item.ideas.validation_source,
         market_size: item.ideas.market_size,
-        validation_methods: item.ideas.validation_methods
+        validation_methods: item.ideas.validation_methods,
+        attachments: item.ideas.attachments
       }));
 
       console.log('Formatted purchased ideas:', formattedIdeas);
@@ -156,11 +158,13 @@ const PurchasedIdeas = () => {
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
+                {/* Description (always for purchased) */}
                 <div className="bg-green-50 p-3 rounded-lg">
                   <h4 className="font-medium text-green-900 mb-2">Full Description</h4>
                   <p className="text-sm text-green-800">{idea.description}</p>
                 </div>
-                
+
+                {/* Problem Description */}
                 {idea.problem_description && (
                   <div className="bg-blue-50 p-3 rounded-lg">
                     <h4 className="font-medium text-blue-900 mb-2">Problem Description</h4>
@@ -168,20 +172,7 @@ const PurchasedIdeas = () => {
                   </div>
                 )}
 
-                {idea.validation_source && (
-                  <div className="bg-blue-50 p-3 rounded-lg">
-                    <h4 className="font-medium text-blue-900 mb-2">Validation Source</h4>
-                    <a 
-                      href={idea.validation_source} 
-                      target="_blank" 
-                      rel="noopener noreferrer"
-                      className="text-sm text-blue-600 hover:text-blue-800 break-all"
-                    >
-                      {idea.validation_source}
-                    </a>
-                  </div>
-                )}
-
+                {/* Market Size */}
                 {idea.market_size && (
                   <div className="bg-blue-50 p-3 rounded-lg">
                     <h4 className="font-medium text-blue-900 mb-2">Market Size</h4>
@@ -189,6 +180,7 @@ const PurchasedIdeas = () => {
                   </div>
                 )}
 
+                {/* Validation Methods */}
                 {idea.validation_methods && idea.validation_methods.length > 0 && (
                   <div className="bg-blue-50 p-3 rounded-lg">
                     <h4 className="font-medium text-blue-900 mb-2">Validation Methods</h4>
@@ -199,7 +191,28 @@ const PurchasedIdeas = () => {
                     </ul>
                   </div>
                 )}
-                
+
+                {/* Attachments - visible for purchased */}
+                {idea.attachments && idea.attachments.length > 0 && (
+                  <div className="bg-blue-50 p-3 rounded-lg">
+                    <h4 className="font-medium text-blue-900 mb-2">Attachments</h4>
+                    <ul className="list-disc list-inside text-blue-800">
+                      {idea.attachments.map((fileUrl, index) => (
+                        <li key={index}>
+                          <a
+                            href={fileUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="underline text-blue-600 hover:text-blue-800"
+                          >
+                            {fileUrl.split('/').pop()}
+                          </a>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+
                 <div className="flex flex-wrap gap-1">
                   {idea.tags.map((tag, index) => (
                     <Badge key={index} variant="secondary" className="text-xs">

@@ -223,6 +223,32 @@ const IdeaCard: React.FC<IdeaCardProps> = ({
     return validationFields.length >= 2;
   };
 
+  // Helper to safely render attachments block
+  const renderAttachments = () => {
+    if (idea.attachments && idea.attachments.length > 0) {
+      return (
+        <div className="bg-blue-50 p-3 rounded-lg mb-3">
+          <h4 className="font-medium text-blue-900 mb-2">Attachments</h4>
+          <ul className="list-disc list-inside text-blue-800">
+            {idea.attachments.map((fileUrl, index) => (
+              <li key={index}>
+                <a
+                  href={fileUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="underline text-blue-600 hover:text-blue-800"
+                >
+                  {fileUrl.split('/').pop()}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </div>
+      );
+    }
+    return null;
+  };
+
   return (
     <>
       <Card className="group relative border-0 bg-white/90 backdrop-blur-xl shadow-lg hover:shadow-2xl transition-all duration-500 rounded-2xl overflow-hidden hover:scale-[1.02] transform">
@@ -307,17 +333,56 @@ const IdeaCard: React.FC<IdeaCardProps> = ({
           </div>
 
           {/* Full Description Section */}
-          {hasAccess && idea.description && (
+          {hasAccess && (
             <div className="p-6 bg-gradient-to-br from-blue-50 to-indigo-50 border-b border-blue-100">
               <div className="flex items-center gap-2 mb-3">
                 <CheckCircle className="h-5 w-5 text-green-600" />
                 <h4 className="font-semibold text-slate-900">Full Access Granted</h4>
               </div>
               <div className="bg-white/80 backdrop-blur-sm rounded-xl p-4 border border-blue-200">
-                <p className="text-slate-700 whitespace-pre-line leading-relaxed mb-3">
-                  {idea.description}
-                </p>
-                <div className="flex items-center gap-2 text-sm">
+                {/* Description */}
+                {idea.description && (
+                  <>
+                    <h5 className="font-semibold text-slate-900 mb-2">Description</h5>
+                    <p className="text-slate-700 whitespace-pre-line leading-relaxed mb-4">
+                      {idea.description}
+                    </p>
+                  </>
+                )}
+
+                {/* Problem Description */}
+                {idea.problem_description && (
+                  <>
+                    <h5 className="font-semibold text-blue-900 mb-2">Problem Description</h5>
+                    <p className="text-blue-800 mb-4">{idea.problem_description}</p>
+                  </>
+                )}
+
+                {/* Market Size */}
+                {idea.market_size && (
+                  <>
+                    <h5 className="font-semibold text-blue-900 mb-2">Market Size</h5>
+                    <p className="text-blue-800 mb-4">{idea.market_size}</p>
+                  </>
+                )}
+
+                {/* Validation Methods */}
+                {idea.validation_methods && idea.validation_methods.length > 0 && (
+                  <>
+                    <h5 className="font-semibold text-blue-900 mb-2">Validation Methods</h5>
+                    <ul className="list-disc list-inside text-blue-800 mb-4">
+                      {idea.validation_methods.map((method, idx) => (
+                        <li key={idx}>{method}</li>
+                      ))}
+                    </ul>
+                  </>
+                )}
+
+                {/* Attachments */}
+                {renderAttachments()}
+
+                {/* Equity */}
+                <div className="flex items-center gap-2 text-sm mt-1">
                   <DollarSign className="h-4 w-4 text-green-600" />
                   <span className="font-semibold text-green-700">Equity Offered: {idea.equity_percentage}%</span>
                 </div>
