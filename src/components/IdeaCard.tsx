@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -78,22 +77,24 @@ const IdeaCard: React.FC<IdeaCardProps> = ({
 
       setIsSaved(!!savedData);
 
-      // Check if user has access to full description - Updated for Stripe payment system
+      // Check if user has access to full description - UPI payment system
       const { data: accessData } = await supabase
         .from('access_requests')
         .select(`
           status,
-          payment_status
+          payment_verifications(verification_status)
         `)
         .eq('idea_id', idea.id)
         .eq('requester_id', user.id)
         .single();
 
       if (accessData) {
-        if (accessData.status === 'approved' && accessData.payment_status === 'completed') {
+        const verificationStatus = accessData.payment_verifications?.[0]?.verification_status;
+        
+        if (accessData.status === 'approved' && verificationStatus === 'verified') {
           setHasAccess(true);
           setAccessGranted(true);
-        } else if (accessData.payment_status === 'pending') {
+        } else if (verificationStatus === 'pending') {
           setPendingVerification(true);
         }
       }
