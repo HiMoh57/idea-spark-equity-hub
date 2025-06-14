@@ -28,7 +28,7 @@ interface Message {
   read_at: string | null;
   profiles?: {
     full_name: string;
-  };
+  } | null;
 }
 
 const DirectMessaging: React.FC<DirectMessagingProps> = ({
@@ -79,15 +79,31 @@ const DirectMessaging: React.FC<DirectMessagingProps> = ({
           subject,
           created_at,
           sender_id,
-          read_at,
-          profiles!messages_sender_id_fkey(full_name)
+          read_at
         `)
         .or(`and(sender_id.eq.${user?.id},receiver_id.eq.${recipientId}),and(sender_id.eq.${recipientId},receiver_id.eq.${user?.id})`)
         .eq('idea_id', ideaId || null)
         .order('created_at', { ascending: true });
 
       if (error) throw error;
-      setMessages(data || []);
+
+      // Fetch profile names separately
+      const messagesWithProfiles = await Promise.all(
+        (data || []).map(async (message) => {
+          const { data: profileData } = await supabase
+            .from('profiles')
+            .select('full_name')
+            .eq('id', message.sender_id)
+            .single();
+
+          return {
+            ...message,
+            profiles: profileData
+          };
+        })
+      );
+
+      setMessages(messagesWithProfiles);
 
       // Mark received messages as read
       const unreadMessages = data?.filter(msg => 

@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -9,7 +10,7 @@ import { useToast } from '@/hooks/use-toast';
 import { Link } from 'react-router-dom';
 
 interface Announcement {
-  id: number;
+  id: string;
   title: string;
   content: string;
   created_at: string;
@@ -79,4 +80,4 @@ const AnnouncementsPage = () => {
   );
 };
 
-export default AnnouncementsPage; 
+export default AnnouncementsPage;

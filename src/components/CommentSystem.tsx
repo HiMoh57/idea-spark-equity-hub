@@ -15,7 +15,7 @@ interface Comment {
   user_id: string;
   profiles?: {
     full_name: string;
-  };
+  } | null;
 }
 
 interface CommentSystemProps {
@@ -44,14 +44,30 @@ const CommentSystem: React.FC<CommentSystemProps> = ({ ideaId }) => {
           id,
           comment,
           created_at,
-          user_id,
-          profiles(full_name)
+          user_id
         `)
         .eq('idea_id', ideaId)
         .order('created_at', { ascending: false });
 
       if (error) throw error;
-      setComments(data || []);
+
+      // Fetch profile names separately
+      const commentsWithProfiles = await Promise.all(
+        (data || []).map(async (comment) => {
+          const { data: profileData } = await supabase
+            .from('profiles')
+            .select('full_name')
+            .eq('id', comment.user_id)
+            .single();
+
+          return {
+            ...comment,
+            profiles: profileData
+          };
+        })
+      );
+
+      setComments(commentsWithProfiles);
     } catch (error: any) {
       toast({
         title: "Error loading comments",
