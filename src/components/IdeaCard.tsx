@@ -1,8 +1,10 @@
+
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Eye, Heart, Clock, User, Lock, Bookmark, CheckCircle } from 'lucide-react';
+import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
+import { Eye, Heart, Clock, User, Lock, Bookmark, CheckCircle, TrendingUp, DollarSign } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
@@ -224,79 +226,120 @@ const IdeaCard: React.FC<IdeaCardProps> = ({
 
   return (
     <>
-      <Card className="border-0 shadow-lg hover:shadow-xl transition-all duration-300 bg-white/80 backdrop-blur-sm group">
-        <CardContent className="p-6">
-          <div className="flex justify-between items-start mb-3">
-            <div className="flex items-center">
-              <Badge className="bg-slate-100 text-slate-800">
-                {idea.category}
-              </Badge>
-              {isIdeaValidated() && (
-                <Badge className="bg-green-100 text-green-800">
-                  <CheckCircle className="h-3 w-3 mr-1" />
-                  Validated
+      <Card className="group relative border-0 bg-white/90 backdrop-blur-xl shadow-lg hover:shadow-2xl transition-all duration-500 rounded-2xl overflow-hidden hover:scale-[1.02] transform">
+        {/* Premium gradient overlay */}
+        <div className="absolute inset-0 bg-gradient-to-br from-blue-50/50 via-transparent to-purple-50/50 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+        
+        <CardContent className="relative p-0">
+          {/* Header Section */}
+          <div className="p-6 pb-4 border-b border-slate-100">
+            <div className="flex items-start justify-between mb-4">
+              <div className="flex items-center gap-3">
+                <Avatar className="h-12 w-12 ring-2 ring-blue-100">
+                  <AvatarFallback className="bg-gradient-to-br from-blue-500 to-purple-500 text-white font-semibold">
+                    {creatorName[0]?.toUpperCase()}
+                  </AvatarFallback>
+                </Avatar>
+                <div>
+                  <p className="font-semibold text-slate-900">{creatorName}</p>
+                  <div className="flex items-center text-xs text-slate-500 gap-1">
+                    <Clock className="h-3 w-3" />
+                    {new Date(idea.created_at).toLocaleDateString()}
+                  </div>
+                </div>
+              </div>
+              
+              <div className="flex flex-col items-end gap-2">
+                <Badge className="bg-gradient-to-r from-blue-100 to-purple-100 text-blue-800 border-blue-200 font-medium">
+                  {idea.category}
                 </Badge>
-              )}
-              <div className="flex items-center text-xs text-slate-500">
-                <Clock className="h-3 w-3 mr-1" />
-                {new Date(idea.created_at).toLocaleDateString()}
+                {isIdeaValidated() && (
+                  <Badge className="bg-gradient-to-r from-green-100 to-emerald-100 text-green-800 border-green-200">
+                    <CheckCircle className="h-3 w-3 mr-1" />
+                    Validated
+                  </Badge>
+                )}
               </div>
             </div>
-            <div className="flex flex-wrap gap-1 mt-2">
-              {idea.tags?.map((tag) => (
-                <Badge key={tag} className="bg-blue-100 text-blue-800">
+
+            <h3 className="text-xl font-bold text-slate-900 mb-3 group-hover:text-blue-600 transition-colors leading-tight">
+              {idea.title}
+            </h3>
+
+            <p className="text-slate-600 mb-4 line-clamp-2 leading-relaxed">
+              {idea.teaser}
+            </p>
+
+            {/* Tags */}
+            <div className="flex flex-wrap gap-2 mb-4">
+              {idea.tags?.slice(0, 3).map((tag) => (
+                <Badge key={tag} variant="outline" className="text-xs bg-slate-50 hover:bg-blue-50 border-slate-200 hover:border-blue-200 transition-colors">
                   {tag}
                 </Badge>
               ))}
+              {idea.tags?.length > 3 && (
+                <Badge variant="outline" className="text-xs bg-slate-50 border-slate-200">
+                  +{idea.tags.length - 3} more
+                </Badge>
+              )}
+            </div>
+
+            {/* Stats */}
+            <div className="flex items-center justify-between text-sm">
+              <div className="flex items-center space-x-4">
+                <div className="flex items-center gap-1 text-slate-500">
+                  <Eye className="h-4 w-4" />
+                  <span className="font-medium">{idea.views.toLocaleString()}</span>
+                </div>
+                <div className="flex items-center gap-1 text-red-500">
+                  <Heart className="h-4 w-4" />
+                  <span className="font-medium">{idea.interests.toLocaleString()}</span>
+                </div>
+                <div className="flex items-center gap-1 text-green-600">
+                  <DollarSign className="h-4 w-4" />
+                  <span className="font-medium">{idea.equity_percentage}% equity</span>
+                </div>
+              </div>
+              <div className="flex items-center gap-1 text-orange-500">
+                <TrendingUp className="h-4 w-4" />
+                <span className="text-xs font-medium">Trending</span>
+              </div>
             </div>
           </div>
 
-          <h3 className="text-xl font-semibold text-slate-900 mb-3 group-hover:text-blue-600 transition-colors">
-            {idea.title}
-          </h3>
-
-          <p className="text-slate-600 mb-4 line-clamp-3">
-            {idea.teaser}
-          </p>
-
+          {/* Full Description Section */}
           {hasAccess && idea.description && (
-            <div className="mb-4 p-4 bg-blue-50 rounded-lg border border-blue-200">
-              <h4 className="font-medium text-blue-900 mb-2">Full Description:</h4>
-              <p className="text-blue-800 text-sm whitespace-pre-line">
-                {idea.description}
-              </p>
-              <div className="mt-3 text-sm text-blue-700">
-                <strong>Equity Offered:</strong> {idea.equity_percentage}%
+            <div className="p-6 bg-gradient-to-br from-blue-50 to-indigo-50 border-b border-blue-100">
+              <div className="flex items-center gap-2 mb-3">
+                <CheckCircle className="h-5 w-5 text-green-600" />
+                <h4 className="font-semibold text-slate-900">Full Access Granted</h4>
+              </div>
+              <div className="bg-white/80 backdrop-blur-sm rounded-xl p-4 border border-blue-200">
+                <p className="text-slate-700 whitespace-pre-line leading-relaxed mb-3">
+                  {idea.description}
+                </p>
+                <div className="flex items-center gap-2 text-sm">
+                  <DollarSign className="h-4 w-4 text-green-600" />
+                  <span className="font-semibold text-green-700">Equity Offered: {idea.equity_percentage}%</span>
+                </div>
               </div>
             </div>
           )}
 
-          <div className="flex items-center justify-between mb-4 text-sm text-slate-500">
-            <div className="flex items-center">
-              <User className="h-4 w-4 mr-1" />
-              {creatorName}
-            </div>
-            <div className="flex items-center space-x-3">
-              <div className="flex items-center">
-                <Eye className="h-4 w-4 mr-1" />
-                {idea.views}
-              </div>
-              <div className="flex items-center">
-                <Heart className="h-4 w-4 mr-1" />
-                {idea.interests}
-              </div>
-            </div>
-          </div>
-
-          <div className="space-y-3">
-            <div className="flex gap-2">
+          {/* Action Section */}
+          <div className="p-6 pt-4">
+            <div className="flex gap-3 mb-4">
               <Button
                 variant="outline"
                 size="sm"
                 onClick={handleToggleInterest}
-                className={isInterested ? "bg-red-50 border-red-200 text-red-700" : ""}
+                className={`flex-1 transition-all duration-300 ${
+                  isInterested 
+                    ? "bg-red-50 border-red-200 text-red-700 hover:bg-red-100" 
+                    : "hover:bg-blue-50 hover:border-blue-200 hover:text-blue-700"
+                }`}
               >
-                <Heart className={`h-4 w-4 mr-1 ${isInterested ? 'fill-red-500 text-red-500' : ''}`} />
+                <Heart className={`h-4 w-4 mr-2 ${isInterested ? 'fill-red-500 text-red-500' : ''}`} />
                 {isInterested ? 'Interested' : 'Show Interest'}
               </Button>
 
@@ -304,38 +347,46 @@ const IdeaCard: React.FC<IdeaCardProps> = ({
                 variant="outline"
                 size="sm"
                 onClick={handleToggleSave}
-                className={isSaved ? "bg-blue-50 border-blue-200 text-blue-700" : ""}
+                className={`flex-1 transition-all duration-300 ${
+                  isSaved 
+                    ? "bg-blue-50 border-blue-200 text-blue-700 hover:bg-blue-100" 
+                    : "hover:bg-orange-50 hover:border-orange-200 hover:text-orange-700"
+                }`}
               >
-                <Bookmark className={`h-4 w-4 mr-1 ${isSaved ? 'fill-blue-500 text-blue-500' : ''}`} />
+                <Bookmark className={`h-4 w-4 mr-2 ${isSaved ? 'fill-blue-500 text-blue-500' : ''}`} />
                 {isSaved ? 'Saved' : 'Save'}
               </Button>
             </div>
 
+            {/* Access Controls */}
             {!hasAccess && !pendingVerification && !accessGranted && (
               <Button 
                 onClick={handleRequestAccess}
-                className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
+                className="w-full bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 hover:from-blue-700 hover:via-purple-700 hover:to-indigo-700 text-white font-semibold py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-[1.02]"
                 size="sm"
               >
                 <Lock className="h-4 w-4 mr-2" />
-                Access Full Details - ₹150
+                Unlock Full Details - ₹150
               </Button>
             )}
 
             {pendingVerification && !accessGranted && (
-              <div className="w-full p-3 bg-yellow-50 border border-yellow-200 rounded-lg text-center">
-                <p className="text-sm text-yellow-800 font-medium">⏱️ Payment Under Verification</p>
-                <p className="text-xs text-yellow-700">We'll grant access within 24 hours</p>
+              <div className="w-full p-4 bg-gradient-to-r from-yellow-50 to-orange-50 border border-yellow-200 rounded-xl text-center">
+                <div className="flex items-center justify-center gap-2 mb-1">
+                  <Clock className="h-4 w-4 text-yellow-600" />
+                  <p className="text-sm text-yellow-800 font-semibold">Payment Under Verification</p>
+                </div>
+                <p className="text-xs text-yellow-700">Access will be granted within 24 hours</p>
               </div>
             )}
 
             {accessGranted && (
-              <div className="w-full p-3 bg-green-50 border border-green-200 rounded-lg text-center">
-                <div className="flex items-center justify-center gap-2">
+              <div className="w-full p-4 bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-xl text-center">
+                <div className="flex items-center justify-center gap-2 mb-1">
                   <CheckCircle className="h-4 w-4 text-green-600" />
-                  <p className="text-sm text-green-800 font-medium">Access Granted</p>
+                  <p className="text-sm text-green-800 font-semibold">Full Access Granted</p>
                 </div>
-                <p className="text-xs text-green-700">Check your dashboard for full access</p>
+                <p className="text-xs text-green-700">Check your dashboard for complete details</p>
               </div>
             )}
           </div>

@@ -2,7 +2,8 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Lightbulb, LogOut, Menu } from 'lucide-react';
+import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
+import { Lightbulb, LogOut, Menu, User } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import {
   DropdownMenu,
@@ -63,22 +64,46 @@ const Navbar = () => {
               <div className="flex items-center space-x-4 ml-6">
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" className="relative h-12 w-12 rounded-full hover:scale-105 transition-transform duration-300">
-                      <div className="h-12 w-12 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 flex items-center justify-center text-white font-bold text-lg shadow-lg hover:shadow-xl transition-shadow duration-300">
-                        {profile?.full_name ? profile.full_name[0].toUpperCase() : user.email ? user.email[0].toUpperCase() : 'U'}
-                      </div>
-                      <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 border-2 border-white rounded-full" />
+                    <Button variant="ghost" className="relative p-0 rounded-full hover:scale-105 transition-transform duration-300">
+                      <Avatar className="h-12 w-12 ring-2 ring-blue-100 hover:ring-blue-200 transition-all duration-300 shadow-lg hover:shadow-xl">
+                        <AvatarImage src="" alt={profile?.full_name || "User"} />
+                        <AvatarFallback className="bg-gradient-to-br from-blue-500 via-purple-500 to-indigo-500 text-white font-bold text-lg">
+                          {profile?.full_name ? profile.full_name[0].toUpperCase() : user.email ? user.email[0].toUpperCase() : 'U'}
+                        </AvatarFallback>
+                      </Avatar>
+                      {/* Online status indicator */}
+                      <div className="absolute -bottom-0.5 -right-0.5 w-4 h-4 bg-green-500 border-2 border-white rounded-full shadow-sm" />
                     </Button>
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent className="w-64 bg-white/95 backdrop-blur-xl border border-white/20 shadow-2xl" align="end" forceMount>
+                  <DropdownMenuContent className="w-72 bg-white/95 backdrop-blur-xl border border-white/20 shadow-2xl rounded-xl" align="end" forceMount>
                     <DropdownMenuLabel className="font-normal p-4">
-                      <div className="flex flex-col space-y-2">
-                        <p className="text-sm font-semibold leading-none text-slate-900">{profile?.full_name || "User"}</p>
-                        <p className="text-xs leading-none text-slate-500 bg-slate-100 px-2 py-1 rounded-lg">
-                          {user.email}
-                        </p>
+                      <div className="flex items-center space-x-3">
+                        <Avatar className="h-12 w-12">
+                          <AvatarFallback className="bg-gradient-to-br from-blue-500 to-purple-500 text-white font-semibold">
+                            {profile?.full_name ? profile.full_name[0].toUpperCase() : user.email ? user.email[0].toUpperCase() : 'U'}
+                          </AvatarFallback>
+                        </Avatar>
+                        <div className="flex flex-col space-y-1">
+                          <p className="text-sm font-semibold leading-none text-slate-900">
+                            {profile?.full_name || "User"}
+                          </p>
+                          <p className="text-xs leading-none text-slate-500 bg-slate-100 px-2 py-1 rounded-lg">
+                            {user.email}
+                          </p>
+                          <div className="flex items-center gap-1 mt-1">
+                            <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                            <span className="text-xs text-green-600 font-medium">Online</span>
+                          </div>
+                        </div>
                       </div>
                     </DropdownMenuLabel>
+                    <DropdownMenuSeparator className="bg-slate-200" />
+                    <DropdownMenuItem asChild className="cursor-pointer p-3 hover:bg-blue-50">
+                      <Link to="/dashboard" className="flex items-center">
+                        <User className="mr-3 h-4 w-4" />
+                        <span>My Profile</span>
+                      </Link>
+                    </DropdownMenuItem>
                     <DropdownMenuSeparator className="bg-slate-200" />
                     <DropdownMenuItem onClick={handleSignOut} className="cursor-pointer p-3 hover:bg-red-50 text-red-600 font-medium">
                       <LogOut className="mr-3 h-4 w-4" />
@@ -107,7 +132,7 @@ const Navbar = () => {
                   <Menu className="h-6 w-6" />
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent className="w-64 bg-white/95 backdrop-blur-xl border border-white/20 shadow-2xl" align="end" forceMount>
+              <DropdownMenuContent className="w-64 bg-white/95 backdrop-blur-xl border border-white/20 shadow-2xl rounded-xl" align="end" forceMount>
                 <DropdownMenuLabel className="font-normal p-4">
                   <div className="flex flex-col space-y-1">
                     <p className="text-sm font-semibold leading-none">{user ? (profile?.full_name || "User") : "Guest"}</p>
