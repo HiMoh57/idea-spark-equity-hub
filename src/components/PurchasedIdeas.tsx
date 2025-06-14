@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -41,29 +42,18 @@ const PurchasedIdeas = () => {
 
   const fetchPurchasedIdeas = async () => {
     try {
-      // Query for UPI payment system
-      const { data, error } = await supabase
+      console.log('Fetching purchased ideas for user:', user?.id);
+      
+      // First get access requests with verified payments
+      const { data: accessRequestsData, error: accessError } = await supabase
         .from('access_requests')
         .select(`
           id,
+          idea_id,
           payment_amount,
           created_at,
           status,
-          ideas!inner (
-            id,
-            title,
-            teaser,
-            description,
-            category,
-            tags,
-            equity_percentage,
-            creator_id,
-            problem_description,
-            validation_source,
-            market_size,
-            validation_methods
-          ),
-          payment_verifications (
+          payment_verifications!inner(
             verification_status
           )
         `)
@@ -71,28 +61,74 @@ const PurchasedIdeas = () => {
         .eq('status', 'approved')
         .eq('payment_verifications.verification_status', 'verified');
 
-      if (error) throw error;
+      if (accessError) {
+        console.error('Access requests error:', accessError);
+        throw accessError;
+      }
 
-      const formattedIdeas = data?.map(item => ({
-        id: item.ideas.id,
-        title: item.ideas.title,
-        teaser: item.ideas.teaser,
-        description: item.ideas.description,
-        category: item.ideas.category,
-        tags: item.ideas.tags || [],
-        equity_percentage: item.ideas.equity_percentage,
-        creator_id: item.ideas.creator_id,
-        access_granted_at: item.created_at,
-        payment_amount: item.payment_amount,
-        verification_status: item.payment_verifications?.[0]?.verification_status || 'pending',
-        problem_description: item.ideas.problem_description,
-        validation_source: item.ideas.validation_source,
-        market_size: item.ideas.market_size,
-        validation_methods: item.ideas.validation_methods
-      })) || [];
+      console.log('Access requests data:', accessRequestsData);
 
+      if (!accessRequestsData || accessRequestsData.length === 0) {
+        setPurchasedIdeas([]);
+        setLoading(false);
+        return;
+      }
+
+      // Get the idea IDs from access requests
+      const ideaIds = accessRequestsData.map(req => req.idea_id);
+      
+      // Now fetch the full idea details
+      const { data: ideasData, error: ideasError } = await supabase
+        .from('ideas')
+        .select(`
+          id,
+          title,
+          teaser,
+          description,
+          category,
+          tags,
+          equity_percentage,
+          creator_id,
+          problem_description,
+          validation_source,
+          market_size,
+          validation_methods
+        `)
+        .in('id', ideaIds);
+
+      if (ideasError) {
+        console.error('Ideas error:', ideasError);
+        throw ideasError;
+      }
+
+      console.log('Ideas data:', ideasData);
+
+      // Combine the data
+      const formattedIdeas = ideasData?.map(idea => {
+        const accessRequest = accessRequestsData.find(req => req.idea_id === idea.id);
+        return {
+          id: idea.id,
+          title: idea.title,
+          teaser: idea.teaser,
+          description: idea.description,
+          category: idea.category,
+          tags: idea.tags || [],
+          equity_percentage: idea.equity_percentage,
+          creator_id: idea.creator_id,
+          access_granted_at: accessRequest?.created_at || '',
+          payment_amount: accessRequest?.payment_amount || 0,
+          verification_status: 'verified',
+          problem_description: idea.problem_description,
+          validation_source: idea.validation_source,
+          market_size: idea.market_size,
+          validation_methods: idea.validation_methods
+        };
+      }) || [];
+
+      console.log('Formatted purchased ideas:', formattedIdeas);
       setPurchasedIdeas(formattedIdeas);
     } catch (error: any) {
+      console.error('Error fetching purchased ideas:', error);
       toast({
         title: "Error loading purchased ideas",
         description: error.message,
