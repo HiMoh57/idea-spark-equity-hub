@@ -43,6 +43,7 @@ const Navbar = () => {
           <div className="hidden md:flex items-center space-x-1 lg:space-x-2">
             {[
               { to: "/explore", label: "Explore Ideas" },
+              { to: "/how-it-works", label: "How it Works" },
               ...(user ? [{ to: "/submit-idea", label: "Submit Idea" }] : []),
               ...(user ? [{ to: "/announcements", label: "Announcements" }] : []),
               { to: "/pricing", label: "Pricing" },
@@ -144,6 +145,9 @@ const Navbar = () => {
                 <DropdownMenuSeparator />
                 <DropdownMenuItem asChild>
                   <Link to="/explore" className="p-3">Explore Ideas</Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link to="/how-it-works" className="p-3">How it Works</Link>
                 </DropdownMenuItem>
                 {user && (
                   <DropdownMenuItem asChild>
