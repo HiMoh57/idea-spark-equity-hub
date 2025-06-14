@@ -86,23 +86,17 @@ const RealtimeNotifications: React.FC = () => {
         {
           event: 'UPDATE',
           schema: 'public',
-          table: 'payment_verifications',
-          filter: `verification_status=eq.verified`
+          table: 'access_requests',
+          filter: `payment_status=eq.completed`
         },
         async (payload) => {
-          console.log('Payment verified:', payload);
-          // Notify the executor that their payment was verified
-          const { data: accessRequest } = await supabase
-            .from('access_requests')
-            .select('requester_id, idea_id')
-            .eq('id', payload.new.access_request_id)
-            .single();
-
-          if (accessRequest?.requester_id === user.id) {
+          console.log('Payment completed:', payload);
+          // Notify the executor that their payment was verified and access is granted
+          if (payload.new.requester_id === user.id) {
             const { data: ideaData } = await supabase
               .from('ideas')
               .select('title')
-              .eq('id', accessRequest.idea_id)
+              .eq('id', payload.new.idea_id)
               .single();
 
             toast({

@@ -78,24 +78,22 @@ const IdeaCard: React.FC<IdeaCardProps> = ({
 
       setIsSaved(!!savedData);
 
-      // Check if user has access to full description
+      // Check if user has access to full description - Updated for Stripe payment system
       const { data: accessData } = await supabase
         .from('access_requests')
         .select(`
           status,
-          payment_verifications(verification_status)
+          payment_status
         `)
         .eq('idea_id', idea.id)
         .eq('requester_id', user.id)
         .single();
 
       if (accessData) {
-        const verificationStatus = accessData.payment_verifications?.[0]?.verification_status;
-        
-        if (accessData.status === 'approved' && verificationStatus === 'verified') {
+        if (accessData.status === 'approved' && accessData.payment_status === 'completed') {
           setHasAccess(true);
           setAccessGranted(true);
-        } else if (verificationStatus === 'pending') {
+        } else if (accessData.payment_status === 'pending') {
           setPendingVerification(true);
         }
       }

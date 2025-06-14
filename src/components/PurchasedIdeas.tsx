@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -18,8 +19,8 @@ interface PurchasedIdea {
   equity_percentage: number;
   creator_id: string;
   access_granted_at: string;
-  payment_amount: number;
-  verification_status: string;
+  amount_paid: number;
+  payment_status: string;
   problem_description?: string;
   validation_source?: string;
   market_size?: string;
@@ -41,13 +42,15 @@ const PurchasedIdeas = () => {
 
   const fetchPurchasedIdeas = async () => {
     try {
+      // Updated query to work with the new Stripe payment system
       const { data, error } = await supabase
         .from('access_requests')
         .select(`
           id,
-          payment_amount,
+          amount_paid,
           created_at,
           status,
+          payment_status,
           ideas!inner (
             id,
             title,
@@ -61,14 +64,11 @@ const PurchasedIdeas = () => {
             validation_source,
             market_size,
             validation_methods
-          ),
-          payment_verifications (
-            verification_status
           )
         `)
         .eq('requester_id', user?.id)
         .eq('status', 'approved')
-        .eq('payment_verifications.verification_status', 'verified');
+        .eq('payment_status', 'completed'); // Check for completed Stripe payments
 
       if (error) throw error;
 
@@ -82,8 +82,8 @@ const PurchasedIdeas = () => {
         equity_percentage: item.ideas.equity_percentage,
         creator_id: item.ideas.creator_id,
         access_granted_at: item.created_at,
-        payment_amount: item.payment_amount,
-        verification_status: item.payment_verifications?.[0]?.verification_status || 'pending',
+        amount_paid: item.amount_paid,
+        payment_status: item.payment_status,
         problem_description: item.ideas.problem_description,
         validation_source: item.ideas.validation_source,
         market_size: item.ideas.market_size,
