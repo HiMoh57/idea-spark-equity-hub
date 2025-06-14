@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -26,6 +27,7 @@ interface IdeaCardProps {
     validation_source?: string;
     market_size?: string;
     validation_methods?: string[];
+    attachments?: string[];
   };
   showFullDescription?: boolean;
   onAccessGranted?: () => void;
