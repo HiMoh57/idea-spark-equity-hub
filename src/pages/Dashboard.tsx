@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Eye, Heart, DollarSign, MessageSquare, Bell, Edit, Trash2, User, Lightbulb } from 'lucide-react';
+import { Eye, Heart, DollarSign, MessageSquare, Bell, Edit, Trash2, User, Lightbulb, TrendingUp, Clock, Star, CheckCircle } from 'lucide-react';
 import Navbar from '@/components/Navbar';
 import PurchasedIdeas from '@/components/PurchasedIdeas';
 import SavedIdeas from '@/components/SavedIdeas';
@@ -135,8 +135,13 @@ const Dashboard = () => {
 
   if (authLoading || loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600"></div>
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50 flex items-center justify-center">
+        <div className="relative">
+          <div className="animate-spin rounded-full h-32 w-32 border-b-4 border-blue-600"></div>
+          <div className="absolute inset-0 flex items-center justify-center">
+            <Lightbulb className="h-8 w-8 text-blue-600 animate-pulse" />
+          </div>
+        </div>
       </div>
     );
   }
@@ -146,219 +151,445 @@ const Dashboard = () => {
   const isCreator = userProfile?.user_type === 'creator' || !userProfile?.user_type;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50">
       <Navbar />
       
-      <div className="pt-20 pb-12 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-6xl mx-auto">
-          <div className="mb-8 flex items-center justify-between">
-            <div>
-              <h1 className="text-3xl font-bold text-slate-900 mb-2">
-                {isCreator ? 'Creator Dashboard' : 'Executor Dashboard'}
-              </h1>
-              <p className="text-slate-600">
-                {isCreator 
-                  ? 'Manage your ideas and track their performance' 
-                  : 'Discover opportunities and manage your investments'}
-              </p>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="flex items-center gap-2 bg-white px-3 py-2 rounded-lg shadow-sm">
-                {isCreator ? <Lightbulb className="h-5 w-5 text-blue-600" /> : <User className="h-5 w-5 text-purple-600" />}
-                <span className="font-medium">{isCreator ? 'Creator' : 'Executor'}</span>
+      <div className="pt-24 pb-12 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto">
+          {/* Header Section */}
+          <div className="mb-12">
+            <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 p-1 shadow-2xl">
+              <div className="bg-white/95 backdrop-blur-xl rounded-3xl p-8">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-6">
+                    <div className="relative">
+                      <div className="w-20 h-20 bg-gradient-to-br from-blue-500 via-purple-500 to-indigo-500 rounded-2xl flex items-center justify-center shadow-lg">
+                        {isCreator ? (
+                          <Lightbulb className="h-10 w-10 text-white" />
+                        ) : (
+                          <User className="h-10 w-10 text-white" />
+                        )}
+                      </div>
+                      <div className="absolute -top-2 -right-2 w-6 h-6 bg-green-500 border-2 border-white rounded-full shadow-sm" />
+                    </div>
+                    <div>
+                      <h1 className="text-4xl font-bold bg-gradient-to-r from-slate-900 to-slate-700 bg-clip-text text-transparent mb-2">
+                        Welcome back, {userProfile?.full_name || 'User'}!
+                      </h1>
+                      <p className="text-lg text-slate-600 mb-3">
+                        {isCreator 
+                          ? 'Manage your ideas and track their performance' 
+                          : 'Discover opportunities and manage your investments'}
+                      </p>
+                      <div className="flex items-center gap-3">
+                        <Badge variant="outline" className="bg-gradient-to-r from-blue-500 to-purple-500 text-white border-0">
+                          {isCreator ? 'Creator' : 'Executor'}
+                        </Badge>
+                        <Badge variant="outline" className="bg-green-100 text-green-700 border-green-200">
+                          Online
+                        </Badge>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="hidden lg:block">
+                    <Button 
+                      onClick={() => navigate(isCreator ? '/submit-idea' : '/explore')}
+                      className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8 py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
+                    >
+                      {isCreator ? 'Submit New Idea' : 'Explore Ideas'}
+                    </Button>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
 
-          {isCreator ? (
-            // Creator Dashboard
-            <Tabs defaultValue="ideas" className="space-y-6">
-              <TabsList className="grid w-full grid-cols-4">
-                <TabsTrigger value="ideas">My Ideas ({userIdeas.length})</TabsTrigger>
-                <TabsTrigger value="requests">Access Requests ({accessRequests.length})</TabsTrigger>
-                <TabsTrigger value="proposals">Proposals ({proposals.length})</TabsTrigger>
-                <TabsTrigger value="notifications">
-                  Notifications ({notifications.filter(n => !n.read_at).length})
-                </TabsTrigger>
-              </TabsList>
+          {/* Stats Overview */}
+          {isCreator && (
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-12">
+              <Card className="bg-gradient-to-br from-blue-500 to-blue-600 border-0 shadow-xl hover:shadow-2xl transition-all duration-300 group">
+                <CardContent className="p-6">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-blue-100 text-sm font-medium">Total Ideas</p>
+                      <p className="text-white text-3xl font-bold">{userIdeas.length}</p>
+                    </div>
+                    <div className="bg-white/20 p-3 rounded-xl group-hover:scale-110 transition-transform duration-300">
+                      <Lightbulb className="h-8 w-8 text-white" />
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
 
-              <TabsContent value="ideas" className="space-y-4">
+              <Card className="bg-gradient-to-br from-purple-500 to-purple-600 border-0 shadow-xl hover:shadow-2xl transition-all duration-300 group">
+                <CardContent className="p-6">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-purple-100 text-sm font-medium">Access Requests</p>
+                      <p className="text-white text-3xl font-bold">{accessRequests.length}</p>
+                    </div>
+                    <div className="bg-white/20 p-3 rounded-xl group-hover:scale-110 transition-transform duration-300">
+                      <MessageSquare className="h-8 w-8 text-white" />
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card className="bg-gradient-to-br from-green-500 to-green-600 border-0 shadow-xl hover:shadow-2xl transition-all duration-300 group">
+                <CardContent className="p-6">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-green-100 text-sm font-medium">Proposals</p>
+                      <p className="text-white text-3xl font-bold">{proposals.length}</p>
+                    </div>
+                    <div className="bg-white/20 p-3 rounded-xl group-hover:scale-110 transition-transform duration-300">
+                      <TrendingUp className="h-8 w-8 text-white" />
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card className="bg-gradient-to-br from-orange-500 to-orange-600 border-0 shadow-xl hover:shadow-2xl transition-all duration-300 group">
+                <CardContent className="p-6">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-orange-100 text-sm font-medium">Notifications</p>
+                      <p className="text-white text-3xl font-bold">{notifications.filter(n => !n.read_at).length}</p>
+                    </div>
+                    <div className="bg-white/20 p-3 rounded-xl group-hover:scale-110 transition-transform duration-300">
+                      <Bell className="h-8 w-8 text-white" />
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          )}
+
+          {/* Main Content */}
+          {isCreator ? (
+            <Tabs defaultValue="ideas" className="space-y-8">
+              <div className="bg-white/80 backdrop-blur-xl rounded-2xl p-2 shadow-lg border border-white/20">
+                <TabsList className="grid w-full grid-cols-4 bg-transparent gap-2">
+                  <TabsTrigger 
+                    value="ideas" 
+                    className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-500 data-[state=active]:to-purple-500 data-[state=active]:text-white rounded-xl font-medium"
+                  >
+                    My Ideas ({userIdeas.length})
+                  </TabsTrigger>
+                  <TabsTrigger 
+                    value="requests"
+                    className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-500 data-[state=active]:to-purple-500 data-[state=active]:text-white rounded-xl font-medium"
+                  >
+                    Requests ({accessRequests.length})
+                  </TabsTrigger>
+                  <TabsTrigger 
+                    value="proposals"
+                    className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-500 data-[state=active]:to-purple-500 data-[state=active]:text-white rounded-xl font-medium"
+                  >
+                    Proposals ({proposals.length})
+                  </TabsTrigger>
+                  <TabsTrigger 
+                    value="notifications"
+                    className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-500 data-[state=active]:to-purple-500 data-[state=active]:text-white rounded-xl font-medium"
+                  >
+                    Notifications ({notifications.filter(n => !n.read_at).length})
+                  </TabsTrigger>
+                </TabsList>
+              </div>
+
+              <TabsContent value="ideas" className="space-y-6">
                 {userIdeas.length === 0 ? (
-                  <Card>
-                    <CardContent className="text-center py-8">
-                      <p className="text-slate-500 mb-4">You haven't submitted any ideas yet.</p>
-                      <Button onClick={() => navigate('/submit-idea')}>
+                  <Card className="bg-white/80 backdrop-blur-xl border-0 shadow-xl">
+                    <CardContent className="text-center py-16">
+                      <div className="w-24 h-24 bg-gradient-to-br from-blue-100 to-purple-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                        <Lightbulb className="h-12 w-12 text-blue-600" />
+                      </div>
+                      <h3 className="text-2xl font-bold text-slate-900 mb-3">No ideas yet</h3>
+                      <p className="text-slate-600 mb-6 max-w-md mx-auto">You haven't submitted any ideas yet. Start sharing your innovative concepts with the world!</p>
+                      <Button 
+                        onClick={() => navigate('/submit-idea')}
+                        className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8 py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300"
+                      >
                         Submit Your First Idea
                       </Button>
                     </CardContent>
                   </Card>
                 ) : (
-                  userIdeas.map((idea: any) => (
-                    <Card key={idea.id} className="hover:shadow-lg transition-shadow">
-                      <CardContent className="p-6">
-                        <div className="flex justify-between items-start mb-4">
-                          <div className="flex-1">
-                            <h3 className="text-xl font-semibold text-slate-900">{idea.title}</h3>
-                            <p className="text-slate-600 mt-1">{idea.teaser}</p>
+                  <div className="grid gap-6">
+                    {userIdeas.map((idea: any) => (
+                      <Card key={idea.id} className="bg-white/80 backdrop-blur-xl border-0 shadow-xl hover:shadow-2xl transition-all duration-300 group overflow-hidden">
+                        <div className="absolute inset-0 bg-gradient-to-r from-blue-500/5 to-purple-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                        <CardContent className="p-8 relative">
+                          <div className="flex justify-between items-start mb-6">
+                            <div className="flex-1">
+                              <div className="flex items-center gap-3 mb-3">
+                                <h3 className="text-2xl font-bold text-slate-900">{idea.title}</h3>
+                                <Badge variant="outline" className="bg-gradient-to-r from-blue-100 to-purple-100 text-blue-700 border-blue-200">
+                                  {idea.category}
+                                </Badge>
+                              </div>
+                              <p className="text-slate-600 text-lg leading-relaxed">{idea.teaser}</p>
+                            </div>
+                            <div className="flex items-center gap-2 ml-6">
+                              <Button 
+                                variant="ghost" 
+                                size="icon" 
+                                onClick={() => navigate(`/edit-idea/${idea.id}`)}
+                                className="hover:bg-blue-100 hover:text-blue-600 rounded-xl transition-colors"
+                              >
+                                <Edit className="h-5 w-5" />
+                              </Button>
+                              <Button 
+                                variant="ghost" 
+                                size="icon" 
+                                onClick={() => deleteIdea(idea.id)}
+                                className="hover:bg-red-100 hover:text-red-600 rounded-xl transition-colors"
+                              >
+                                <Trash2 className="h-5 w-5" />
+                              </Button>
+                            </div>
                           </div>
-                          <div className="flex items-center gap-2">
-                            <Badge variant="outline">{idea.category}</Badge>
-                            <Button variant="ghost" size="icon" onClick={() => navigate(`/edit-idea/${idea.id}`)}>
-                              <Edit className="h-4 w-4" />
-                            </Button>
-                            <Button variant="ghost" size="icon" onClick={() => deleteIdea(idea.id)}>
-                              <Trash2 className="h-4 w-4" />
-                            </Button>
+                          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                            <div className="flex items-center gap-3 p-3 bg-slate-50 rounded-xl">
+                              <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+                                <Eye className="h-5 w-5 text-blue-600" />
+                              </div>
+                              <div>
+                                <p className="text-sm text-slate-500">Views</p>
+                                <p className="font-semibold text-slate-900">{idea.views || 0}</p>
+                              </div>
+                            </div>
+                            <div className="flex items-center gap-3 p-3 bg-slate-50 rounded-xl">
+                              <div className="w-10 h-10 bg-red-100 rounded-lg flex items-center justify-center">
+                                <Heart className="h-5 w-5 text-red-600" />
+                              </div>
+                              <div>
+                                <p className="text-sm text-slate-500">Interests</p>
+                                <p className="font-semibold text-slate-900">{idea.interests || 0}</p>
+                              </div>
+                            </div>
+                            <div className="flex items-center gap-3 p-3 bg-slate-50 rounded-xl">
+                              <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
+                                <DollarSign className="h-5 w-5 text-green-600" />
+                              </div>
+                              <div>
+                                <p className="text-sm text-slate-500">Equity</p>
+                                <p className="font-semibold text-slate-900">{idea.equity_percentage}%</p>
+                              </div>
+                            </div>
+                            <div className="flex items-center gap-3 p-3 bg-slate-50 rounded-xl">
+                              <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
+                                <Clock className="h-5 w-5 text-purple-600" />
+                              </div>
+                              <div>
+                                <p className="text-sm text-slate-500">Created</p>
+                                <p className="font-semibold text-slate-900">{new Date(idea.created_at).toLocaleDateString()}</p>
+                              </div>
+                            </div>
                           </div>
-                        </div>
-                        <div className="flex items-center gap-4 text-sm text-slate-500">
-                          <div className="flex items-center gap-1">
-                            <Eye className="h-4 w-4" />
-                            <span>{idea.views} views</span>
-                          </div>
-                          <div className="flex items-center gap-1">
-                            <Heart className="h-4 w-4" />
-                            <span>{idea.interests} interests</span>
-                          </div>
-                          <div className="flex items-center gap-1">
-                            <DollarSign className="h-4 w-4" />
-                            <span>{idea.equity_percentage}% equity</span>
-                          </div>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  ))
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
                 )}
               </TabsContent>
 
-              <TabsContent value="requests" className="space-y-4">
+              <TabsContent value="requests" className="space-y-6">
                 {accessRequests.length === 0 ? (
-                  <Card>
-                    <CardContent className="text-center py-8">
-                      <p className="text-slate-500">No access requests yet.</p>
+                  <Card className="bg-white/80 backdrop-blur-xl border-0 shadow-xl">
+                    <CardContent className="text-center py-16">
+                      <div className="w-24 h-24 bg-gradient-to-br from-purple-100 to-pink-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                        <MessageSquare className="h-12 w-12 text-purple-600" />
+                      </div>
+                      <h3 className="text-2xl font-bold text-slate-900 mb-3">No access requests</h3>
+                      <p className="text-slate-600">When executors request access to your ideas, they'll appear here.</p>
                     </CardContent>
                   </Card>
                 ) : (
-                  accessRequests.map((request: any) => (
-                    <Card key={request.id} className="hover:shadow-lg transition-shadow">
-                      <CardContent className="p-6">
-                        <div className="flex justify-between items-start mb-4">
-                          <div className="flex-1">
-                            <h3 className="text-xl font-semibold text-slate-900">{request.ideas.title}</h3>
-                            <p className="text-slate-600 mt-1">Requested by: {request.executor_id}</p>
-                          </div>
-                          <div className="flex items-center gap-2">
-                            <Button variant="outline" size="sm" onClick={() => navigate(`/view-request/${request.id}`)}>
+                  <div className="grid gap-6">
+                    {accessRequests.map((request: any) => (
+                      <Card key={request.id} className="bg-white/80 backdrop-blur-xl border-0 shadow-xl hover:shadow-2xl transition-all duration-300">
+                        <CardContent className="p-8">
+                          <div className="flex justify-between items-start mb-4">
+                            <div className="flex-1">
+                              <h3 className="text-xl font-semibold text-slate-900 mb-2">{request.ideas.title}</h3>
+                              <p className="text-slate-600">Requested by: {request.executor_id}</p>
+                            </div>
+                            <Button 
+                              variant="outline" 
+                              onClick={() => navigate(`/view-request/${request.id}`)}
+                              className="border-blue-200 text-blue-600 hover:bg-blue-50"
+                            >
                               View Details
                             </Button>
                           </div>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  ))
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
                 )}
               </TabsContent>
 
-              <TabsContent value="proposals" className="space-y-4">
+              <TabsContent value="proposals" className="space-y-6">
                 {proposals.length === 0 ? (
-                  <Card>
-                    <CardContent className="text-center py-8">
-                      <p className="text-slate-500">No proposals yet.</p>
+                  <Card className="bg-white/80 backdrop-blur-xl border-0 shadow-xl">
+                    <CardContent className="text-center py-16">
+                      <div className="w-24 h-24 bg-gradient-to-br from-green-100 to-emerald-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                        <TrendingUp className="h-12 w-12 text-green-600" />
+                      </div>
+                      <h3 className="text-2xl font-bold text-slate-900 mb-3">No proposals yet</h3>
+                      <p className="text-slate-600">When executors submit proposals for your ideas, they'll appear here.</p>
                     </CardContent>
                   </Card>
                 ) : (
-                  proposals.map((proposal: any) => (
-                    <Card key={proposal.id} className="hover:shadow-lg transition-shadow">
-                      <CardContent className="p-6">
-                        <div className="flex justify-between items-start mb-4">
-                          <div className="flex-1">
-                            <h3 className="text-xl font-semibold text-slate-900">{proposal.ideas.title}</h3>
-                            <p className="text-slate-600 mt-1">Proposed by: {proposal.profiles.full_name}</p>
-                          </div>
-                          <div className="flex items-center gap-2">
-                            <Button variant="outline" size="sm" onClick={() => navigate(`/view-proposal/${proposal.id}`)}>
+                  <div className="grid gap-6">
+                    {proposals.map((proposal: any) => (
+                      <Card key={proposal.id} className="bg-white/80 backdrop-blur-xl border-0 shadow-xl hover:shadow-2xl transition-all duration-300">
+                        <CardContent className="p-8">
+                          <div className="flex justify-between items-start mb-4">
+                            <div className="flex-1">
+                              <h3 className="text-xl font-semibold text-slate-900 mb-2">{proposal.ideas.title}</h3>
+                              <p className="text-slate-600">Proposed by: {proposal.profiles.full_name}</p>
+                            </div>
+                            <Button 
+                              variant="outline" 
+                              onClick={() => navigate(`/view-proposal/${proposal.id}`)}
+                              className="border-green-200 text-green-600 hover:bg-green-50"
+                            >
                               View Details
                             </Button>
                           </div>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  ))
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
                 )}
               </TabsContent>
 
-              <TabsContent value="notifications" className="space-y-4">
+              <TabsContent value="notifications" className="space-y-6">
                 {notifications.length === 0 ? (
-                  <Card>
-                    <CardContent className="text-center py-8">
-                      <p className="text-slate-500">No notifications yet.</p>
+                  <Card className="bg-white/80 backdrop-blur-xl border-0 shadow-xl">
+                    <CardContent className="text-center py-16">
+                      <div className="w-24 h-24 bg-gradient-to-br from-orange-100 to-yellow-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                        <Bell className="h-12 w-12 text-orange-600" />
+                      </div>
+                      <h3 className="text-2xl font-bold text-slate-900 mb-3">No notifications</h3>
+                      <p className="text-slate-600">You're all caught up! Notifications will appear here when you have updates.</p>
                     </CardContent>
                   </Card>
                 ) : (
-                  notifications.map((notification: any) => (
-                    <Card key={notification.id} className="hover:shadow-lg transition-shadow">
-                      <CardContent className="p-6">
-                        <div className="flex justify-between items-start mb-4">
-                          <div className="flex-1">
-                            <h3 className="text-xl font-semibold text-slate-900">{notification.title}</h3>
-                            <p className="text-slate-600 mt-1">{notification.message}</p>
+                  <div className="grid gap-6">
+                    {notifications.map((notification: any) => (
+                      <Card key={notification.id} className="bg-white/80 backdrop-blur-xl border-0 shadow-xl hover:shadow-2xl transition-all duration-300">
+                        <CardContent className="p-8">
+                          <div className="flex justify-between items-start mb-4">
+                            <div className="flex-1">
+                              <div className="flex items-center gap-3 mb-3">
+                                <h3 className="text-xl font-semibold text-slate-900">{notification.title}</h3>
+                                {!notification.read_at && (
+                                  <Badge className="bg-blue-500 text-white">New</Badge>
+                                )}
+                              </div>
+                              <p className="text-slate-600">{notification.message}</p>
+                            </div>
+                            {!notification.read_at && (
+                              <Button 
+                                variant="outline" 
+                                size="sm" 
+                                onClick={() => markNotificationAsRead(notification.id)}
+                                className="border-blue-200 text-blue-600 hover:bg-blue-50"
+                              >
+                                <CheckCircle className="h-4 w-4 mr-2" />
+                                Mark as Read
+                              </Button>
+                            )}
                           </div>
-                          <div className="flex items-center gap-2">
-                            <Button variant="outline" size="sm" onClick={() => markNotificationAsRead(notification.id)}>
-                              Mark as Read
-                            </Button>
-                          </div>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  ))
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
                 )}
               </TabsContent>
             </Tabs>
           ) : (
-            // Executor Dashboard
-            <Tabs defaultValue="purchased" className="space-y-6">
-              <TabsList className="grid w-full grid-cols-3">
-                <TabsTrigger value="purchased">Purchased Ideas</TabsTrigger>
-                <TabsTrigger value="saved">Saved Ideas</TabsTrigger>
-                <TabsTrigger value="notifications">
-                  Notifications ({notifications.filter(n => !n.read_at).length})
-                </TabsTrigger>
-              </TabsList>
+            <Tabs defaultValue="purchased" className="space-y-8">
+              <div className="bg-white/80 backdrop-blur-xl rounded-2xl p-2 shadow-lg border border-white/20">
+                <TabsList className="grid w-full grid-cols-3 bg-transparent gap-2">
+                  <TabsTrigger 
+                    value="purchased" 
+                    className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-500 data-[state=active]:to-purple-500 data-[state=active]:text-white rounded-xl font-medium"
+                  >
+                    Purchased Ideas
+                  </TabsTrigger>
+                  <TabsTrigger 
+                    value="saved"
+                    className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-500 data-[state=active]:to-purple-500 data-[state=active]:text-white rounded-xl font-medium"
+                  >
+                    Saved Ideas
+                  </TabsTrigger>
+                  <TabsTrigger 
+                    value="notifications"
+                    className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-500 data-[state=active]:to-purple-500 data-[state=active]:text-white rounded-xl font-medium"
+                  >
+                    Notifications ({notifications.filter(n => !n.read_at).length})
+                  </TabsTrigger>
+                </TabsList>
+              </div>
 
               <TabsContent value="purchased">
-                <PurchasedIdeas />
+                <div className="bg-white/80 backdrop-blur-xl rounded-3xl p-8 shadow-xl border border-white/20">
+                  <PurchasedIdeas />
+                </div>
               </TabsContent>
 
               <TabsContent value="saved">
-                <SavedIdeas />
+                <div className="bg-white/80 backdrop-blur-xl rounded-3xl p-8 shadow-xl border border-white/20">
+                  <SavedIdeas />
+                </div>
               </TabsContent>
 
-              <TabsContent value="notifications" className="space-y-4">
+              <TabsContent value="notifications" className="space-y-6">
                 {notifications.length === 0 ? (
-                  <Card>
-                    <CardContent className="text-center py-8">
-                      <p className="text-slate-500">No notifications yet.</p>
+                  <Card className="bg-white/80 backdrop-blur-xl border-0 shadow-xl">
+                    <CardContent className="text-center py-16">
+                      <div className="w-24 h-24 bg-gradient-to-br from-orange-100 to-yellow-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                        <Bell className="h-12 w-12 text-orange-600" />
+                      </div>
+                      <h3 className="text-2xl font-bold text-slate-900 mb-3">No notifications</h3>
+                      <p className="text-slate-600">You're all caught up! Notifications will appear here when you have updates.</p>
                     </CardContent>
                   </Card>
                 ) : (
-                  notifications.map((notification: any) => (
-                    <Card key={notification.id} className="hover:shadow-lg transition-shadow">
-                      <CardContent className="p-6">
-                        <div className="flex justify-between items-start mb-4">
-                          <div className="flex-1">
-                            <h3 className="text-xl font-semibold text-slate-900">{notification.title}</h3>
-                            <p className="text-slate-600 mt-1">{notification.message}</p>
+                  <div className="grid gap-6">
+                    {notifications.map((notification: any) => (
+                      <Card key={notification.id} className="bg-white/80 backdrop-blur-xl border-0 shadow-xl hover:shadow-2xl transition-all duration-300">
+                        <CardContent className="p-8">
+                          <div className="flex justify-between items-start mb-4">
+                            <div className="flex-1">
+                              <div className="flex items-center gap-3 mb-3">
+                                <h3 className="text-xl font-semibold text-slate-900">{notification.title}</h3>
+                                {!notification.read_at && (
+                                  <Badge className="bg-blue-500 text-white">New</Badge>
+                                )}
+                              </div>
+                              <p className="text-slate-600">{notification.message}</p>
+                            </div>
+                            {!notification.read_at && (
+                              <Button 
+                                variant="outline" 
+                                size="sm" 
+                                onClick={() => markNotificationAsRead(notification.id)}
+                                className="border-blue-200 text-blue-600 hover:bg-blue-50"
+                              >
+                                <CheckCircle className="h-4 w-4 mr-2" />
+                                Mark as Read
+                              </Button>
+                            )}
                           </div>
-                          <div className="flex items-center gap-2">
-                            <Button variant="outline" size="sm" onClick={() => markNotificationAsRead(notification.id)}>
-                              Mark as Read
-                            </Button>
-                          </div>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  ))
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
                 )}
               </TabsContent>
             </Tabs>
