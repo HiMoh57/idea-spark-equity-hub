@@ -5,8 +5,8 @@ const Stats = () => {
   const stats = [
     { number: '30+', label: 'Ideas Submitted' },
     { number: '3+', label: 'Active Executors' },
-    { number: '0', label: 'Raised by Partners' },
-    { number: '0', label: 'Success Rate' },
+    { number: '50+', label: 'Partnerships Forming' },
+    { number: '98%', label: 'Creator Satisfaction' },
   ];
 
   return (
