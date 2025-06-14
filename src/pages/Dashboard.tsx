@@ -22,6 +22,7 @@ const Dashboard = () => {
   const [accessRequests, setAccessRequests] = useState([]);
   const [notifications, setNotifications] = useState([]);
   const [proposals, setProposals] = useState([]);
+  const [purchasedIdeasCount, setPurchasedIdeasCount] = useState(0);
 
   useEffect(() => {
     if (!authLoading && !user) {
@@ -76,6 +77,19 @@ const Dashboard = () => {
         setUserIdeas(ideasData || []);
         setAccessRequests(requestsData || []);
         setProposals(proposalsData || []);
+      } else {
+        // For executors, get count of purchased ideas
+        const { data: purchasedData } = await supabase
+          .from('access_requests')
+          .select(`
+            id,
+            payment_verifications!inner(verification_status)
+          `)
+          .eq('requester_id', user.id)
+          .eq('status', 'approved')
+          .eq('payment_verifications.verification_status', 'verified');
+
+        setPurchasedIdeasCount(purchasedData?.length || 0);
       }
 
       // Fetch notifications
@@ -205,7 +219,7 @@ const Dashboard = () => {
           </div>
 
           {/* Stats Overview */}
-          {isCreator && (
+          {isCreator ? (
             <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-12">
               <Card className="bg-gradient-to-br from-blue-500 to-blue-600 border-0 shadow-xl hover:shadow-2xl transition-all duration-300 group">
                 <CardContent className="p-6">
@@ -244,6 +258,50 @@ const Dashboard = () => {
                     </div>
                     <div className="bg-white/20 p-3 rounded-xl group-hover:scale-110 transition-transform duration-300">
                       <TrendingUp className="h-8 w-8 text-white" />
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card className="bg-gradient-to-br from-orange-500 to-orange-600 border-0 shadow-xl hover:shadow-2xl transition-all duration-300 group">
+                <CardContent className="p-6">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-orange-100 text-sm font-medium">Notifications</p>
+                      <p className="text-white text-3xl font-bold">{notifications.filter(n => !n.read_at).length}</p>
+                    </div>
+                    <div className="bg-white/20 p-3 rounded-xl group-hover:scale-110 transition-transform duration-300">
+                      <Bell className="h-8 w-8 text-white" />
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+              <Card className="bg-gradient-to-br from-blue-500 to-blue-600 border-0 shadow-xl hover:shadow-2xl transition-all duration-300 group">
+                <CardContent className="p-6">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-blue-100 text-sm font-medium">Purchased Ideas</p>
+                      <p className="text-white text-3xl font-bold">{purchasedIdeasCount}</p>
+                    </div>
+                    <div className="bg-white/20 p-3 rounded-xl group-hover:scale-110 transition-transform duration-300">
+                      <Eye className="h-8 w-8 text-white" />
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card className="bg-gradient-to-br from-green-500 to-green-600 border-0 shadow-xl hover:shadow-2xl transition-all duration-300 group">
+                <CardContent className="p-6">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-green-100 text-sm font-medium">Saved Ideas</p>
+                      <p className="text-white text-3xl font-bold">0</p>
+                    </div>
+                    <div className="bg-white/20 p-3 rounded-xl group-hover:scale-110 transition-transform duration-300">
+                      <Heart className="h-8 w-8 text-white" />
                     </div>
                   </div>
                 </CardContent>
@@ -519,7 +577,7 @@ const Dashboard = () => {
                     value="purchased" 
                     className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-500 data-[state=active]:to-purple-500 data-[state=active]:text-white rounded-xl font-medium"
                   >
-                    Purchased Ideas
+                    Purchased Ideas ({purchasedIdeasCount})
                   </TabsTrigger>
                   <TabsTrigger 
                     value="saved"
