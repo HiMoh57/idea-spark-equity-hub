@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -55,32 +56,99 @@ const UpiPaymentModal: React.FC<UpiPaymentModalProps> = ({
     setLoading(true);
 
     try {
-      // Create access request
-      const { data: accessRequest, error: requestError } = await supabase
+      console.log('Checking for existing access request...');
+      
+      // First check if an access request already exists
+      const { data: existingRequest, error: checkError } = await supabase
         .from('access_requests')
-        .insert({
-          idea_id: ideaId,
-          requester_id: user.id,
-          payment_amount: amount * 100, // Store in paise
-          status: 'pending'
-        })
-        .select()
-        .single();
+        .select('id, status')
+        .eq('idea_id', ideaId)
+        .eq('requester_id', user.id)
+        .maybeSingle();
 
-      if (requestError) throw requestError;
+      if (checkError) {
+        console.error('Error checking existing request:', checkError);
+        throw checkError;
+      }
 
-      // Create payment verification record
-      const { error: verificationError } = await supabase
+      let accessRequestId: string;
+
+      if (existingRequest) {
+        console.log('Found existing access request:', existingRequest);
+        accessRequestId = existingRequest.id;
+        
+        // Update the existing request if needed
+        if (existingRequest.status !== 'pending') {
+          const { error: updateError } = await supabase
+            .from('access_requests')
+            .update({
+              payment_amount: amount * 100,
+              status: 'pending'
+            })
+            .eq('id', existingRequest.id);
+
+          if (updateError) throw updateError;
+        }
+      } else {
+        console.log('Creating new access request...');
+        
+        // Create new access request
+        const { data: accessRequest, error: requestError } = await supabase
+          .from('access_requests')
+          .insert({
+            idea_id: ideaId,
+            requester_id: user.id,
+            payment_amount: amount * 100, // Store in paise
+            status: 'pending'
+          })
+          .select()
+          .single();
+
+        if (requestError) throw requestError;
+        accessRequestId = accessRequest.id;
+      }
+
+      console.log('Access request ID:', accessRequestId);
+
+      // Check if payment verification already exists
+      const { data: existingVerification, error: verificationCheckError } = await supabase
         .from('payment_verifications')
-        .insert({
-          access_request_id: accessRequest.id,
-          amount: amount * 100,
-          upi_id: formData.upiId,
-          transaction_id: formData.transactionId,
-          verification_status: 'pending'
-        });
+        .select('id')
+        .eq('access_request_id', accessRequestId)
+        .maybeSingle();
 
-      if (verificationError) throw verificationError;
+      if (verificationCheckError) {
+        console.error('Error checking existing verification:', verificationCheckError);
+        throw verificationCheckError;
+      }
+
+      if (existingVerification) {
+        // Update existing verification
+        const { error: verificationError } = await supabase
+          .from('payment_verifications')
+          .update({
+            amount: amount * 100,
+            upi_id: formData.upiId,
+            transaction_id: formData.transactionId,
+            verification_status: 'pending'
+          })
+          .eq('id', existingVerification.id);
+
+        if (verificationError) throw verificationError;
+      } else {
+        // Create new payment verification record
+        const { error: verificationError } = await supabase
+          .from('payment_verifications')
+          .insert({
+            access_request_id: accessRequestId,
+            amount: amount * 100,
+            upi_id: formData.upiId,
+            transaction_id: formData.transactionId,
+            verification_status: 'pending'
+          });
+
+        if (verificationError) throw verificationError;
+      }
 
       toast({
         title: "Verification Submitted!",
@@ -92,6 +160,7 @@ const UpiPaymentModal: React.FC<UpiPaymentModalProps> = ({
       setStep('qr');
       setFormData({ upiId: '', transactionId: '', screenshot: null });
     } catch (error: any) {
+      console.error('Submission error:', error);
       toast({
         title: "Submission Error",
         description: error.message,
