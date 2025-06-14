@@ -22,7 +22,7 @@ const HowItWorks = () => {
 {
   icon: <DollarSign className="h-8 w-8 text-green-600" />,
   title: "Earn From Your Ideas",
-  description: "Charge a small fee to unlock your idea — and get 3–5% equity if someone brings it to life.",
+  description: "Charge a small fee to unlock your idea — and get 5–15% equity if someone brings it to life. You also earn a 70% payout of the total unlock fee.",
   details: "Build passive ownership in startups without needing to execute every idea yourself."
 },
 {
