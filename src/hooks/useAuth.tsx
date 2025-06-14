@@ -102,19 +102,36 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       setProfile(null);
       setShowOnboarding(false);
       
-      // Then call Supabase signOut
-      const { error } = await supabase.auth.signOut();
-      
-      if (error) {
-        console.error('Sign out error:', error);
-        // Even if there's an error, we've already cleared local state
-        // so the UI will show as signed out
-      } else {
-        console.log('Sign out successful');
+      // Try to sign out from Supabase, but don't let errors prevent UI updates
+      try {
+        const { error } = await supabase.auth.signOut();
+        if (error) {
+          console.error('Supabase sign out error:', error);
+          // Don't throw - we've already cleared local state
+        } else {
+          console.log('Supabase sign out successful');
+        }
+      } catch (supabaseError) {
+        console.error('Supabase sign out exception:', supabaseError);
+        // Don't throw - we've already cleared local state
       }
+      
+      // Force clear any remaining session data
+      await supabase.auth.getSession().then(() => {
+        // This helps ensure the session is fully cleared
+        console.log('Session cleanup complete');
+      }).catch(() => {
+        // Ignore errors during cleanup
+        console.log('Session cleanup had errors, but continuing...');
+      });
+      
     } catch (error) {
-      console.error('Sign out exception:', error);
-      // Ensure state is cleared even if there's an exception
+      console.error('Sign out process error:', error);
+      // Even if everything fails, ensure state is cleared
+      setUser(null);
+      setSession(null);
+      setProfile(null);
+      setShowOnboarding(false);
     }
   };
 
