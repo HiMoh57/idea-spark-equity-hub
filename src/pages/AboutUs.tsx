@@ -9,40 +9,34 @@ import { Users, Target, Heart, Lightbulb, Star, Award } from 'lucide-react';
 const AboutUs = () => {
   const teamMembers = [
     {
-      name: "Alex Johnson",
-      role: "CEO & Co-Founder",
-      description: "Visionary entrepreneur with 10+ years in startup ecosystem",
+      name: "Mohit Rai",
+      role: "Co-Founder & CEO",
+      description: "Visionary entrepreneur working with Ishaan for almost 4 years as school-friends and co-founders on 35+ startup ideas, failing, leaning, emegrging together.",
       icon: <Star className="h-6 w-6 text-blue-600" />
     },
     {
-      name: "Sarah Chen",
-      role: "CTO & Co-Founder", 
-      description: "Tech innovator passionate about connecting ideas with execution",
+      name: "Ishaan Kesarwani",
+      role: "Co-Founder & COO", 
+      description: "Hey! Working with Mohit for almost 4 years as school-friends and co-founders on 35+ startup ideas, failing, leaning, emegrging together. Now handling the operations of IdeoPark.",
       icon: <Lightbulb className="h-6 w-6 text-purple-600" />
     },
-    {
-      name: "Michael Rodriguez",
-      role: "Head of Community",
-      description: "Building bridges between creators and executors worldwide",
-      icon: <Users className="h-6 w-6 text-green-600" />
-    }
   ];
 
   const values = [
     {
       icon: <Target className="h-8 w-8 text-blue-600" />,
-      title: "Innovation First",
-      description: "We believe every great idea deserves a chance to become reality"
+      title: "Empower Creativity",
+      description: "We believe every individual has the power to imagine something that could change the world — and they should be rewarded for it."
     },
     {
       icon: <Heart className="h-8 w-8 text-red-600" />,
-      title: "Community Driven",
-      description: "Our platform thrives on the collaboration between visionaries and builders"
+      title: "Ownership Matters",
+      description: "Great ideas deserve credit. We ensure that ideators are not just acknowledged, but earn real ownership in the companies they inspire."
     },
     {
       icon: <Award className="h-8 w-8 text-yellow-600" />,
-      title: "Excellence",
-      description: "We're committed to providing the highest quality platform for idea exchange"
+      title: "Build Together, Grow Together",
+      description: "We're fostering a global community where thinkers, builders, and investors can collaborate to bring powerful ideas to life — with shared success for everyone."
     }
   ];
 
@@ -69,18 +63,16 @@ const AboutUs = () => {
               <h2 className="text-3xl font-bold text-center mb-8 text-slate-800">Our Story</h2>
               <div className="prose prose-lg max-w-4xl mx-auto text-slate-700">
                 <p className="text-lg leading-relaxed mb-6">
-                  IdeoPark was born from a simple observation: countless brilliant startup ideas never see the light of day, 
-                  not because they lack potential, but because they lack the right execution partner. Meanwhile, 
-                  talented entrepreneurs and developers are constantly searching for their next big opportunity.
+                  IdeoPark was born from a simple truth:
+                  Thousands of brilliant startup ideas fade away — not due to a lack of potential, but because they never find the right hands to bring them to life. At the same time, skilled entrepreneurs and builders are constantly on the lookout for their next big opportunity.
+                  IdeoPark bridges that gap — turning untapped ideas into real ventures.
                 </p>
                 <p className="text-lg leading-relaxed mb-6">
-                  Founded in 2024, we set out to create the world's first secure marketplace specifically designed 
-                  for startup ideas. Our platform ensures that idea creators maintain control and ownership while 
-                  providing a safe space for collaboration with potential executors.
+                  Founded in June 2025, IdeoPark set out to build the world’s first secure marketplace for startup ideas.
+                  Our mission is simple: give idea creators full control and rightful ownership while offering a trusted space for collaboration. With IdeoPark, innovators can safely share their visions and connect with the right people to turn them into reality.
                 </p>
                 <p className="text-lg leading-relaxed">
-                  Today, IdeoPark serves as a bridge between visionaries and builders, fostering innovation 
-                  and creating successful partnerships that benefit everyone involved.
+                  Today, IdeoPark is the bridge between visionaries and builders — turning bold ideas into real ventures, and fostering partnerships where everyone wins.
                 </p>
               </div>
             </CardContent>
