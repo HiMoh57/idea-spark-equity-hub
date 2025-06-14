@@ -17,6 +17,7 @@ import PaymentSuccess from "./pages/PaymentSuccess";
 import NotFound from "./pages/NotFound";
 import AnnouncementsPage from "./pages/AnnouncementsPage";
 import HowItWorks from "./pages/HowItWorks";
+import AboutUs from "./pages/AboutUs";
 import RealtimeNotifications from "./components/RealtimeNotifications";
 import { useAuth } from '@/hooks/useAuth';
 import OnboardingModal from '@/components/OnboardingModal';
@@ -39,6 +40,7 @@ const App = () => {
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/explore" element={<Explore />} />
             <Route path="/how-it-works" element={<HowItWorks />} />
+            <Route path="/about-us" element={<AboutUs />} />
             <Route path="/submit-idea" element={<SubmitIdea />} />
             <Route path="/terms" element={<Terms />} />
             <Route path="/privacy" element={<Privacy />} />
