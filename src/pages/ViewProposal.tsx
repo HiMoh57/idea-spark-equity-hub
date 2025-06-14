@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
@@ -95,8 +94,8 @@ const ViewProposal = () => {
               <div>
                 <h3 className="text-lg font-semibold text-slate-900 mb-3">Idea Details</h3>
                 <div className="bg-slate-50 rounded-xl p-4">
-                  <h4 className="font-medium text-slate-900 mb-2">{proposal.ideas.title}</h4>
-                  <p className="text-slate-600">{proposal.ideas.teaser}</p>
+                  <h4 className="font-medium text-slate-900 mb-2">{proposal.ideas?.title}</h4>
+                  <p className="text-slate-600">{proposal.ideas?.teaser}</p>
                 </div>
               </div>
 
