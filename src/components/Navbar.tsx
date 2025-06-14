@@ -44,6 +44,7 @@ const Navbar = () => {
             {[
               { to: "/explore", label: "Explore Ideas" },
               { to: "/how-it-works", label: "How it Works" },
+              { to: "/about-us", label: "About Us" },
               ...(user ? [{ to: "/submit-idea", label: "Submit Idea" }] : []),
               ...(user ? [{ to: "/announcements", label: "Announcements" }] : []),
               { to: "/pricing", label: "Pricing" },
@@ -148,6 +149,9 @@ const Navbar = () => {
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
                   <Link to="/how-it-works" className="p-3">How it Works</Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link to="/about-us" className="p-3">About Us</Link>
                 </DropdownMenuItem>
                 {user && (
                   <DropdownMenuItem asChild>
