@@ -1,7 +1,7 @@
+
 import { useState, useEffect, createContext, useContext } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
-import { useIsMobile } from '@/hooks/use-mobile';
 
 interface AuthContextType {
   user: User | null;
@@ -37,7 +37,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [profile, setProfile] = useState<any | null>(null);
   const [loading, setLoading] = useState(true);
   const [showOnboarding, setShowOnboarding] = useState(false);
-  const isMobile = useIsMobile();
 
   // Fetch profile when user changes
   useEffect(() => {
@@ -50,8 +49,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       
       if (data) {
         setProfile(data);
-        // Show onboarding if profile is not complete AND user is on desktop
-        if (!data.profile_complete && !isMobile) {
+        // Show onboarding if profile is not complete
+        if (!data.profile_complete) {
           setShowOnboarding(true);
         }
       } else {
@@ -64,7 +63,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     } else {
       setProfile(null);
     }
-  }, [user, isMobile]);
+  }, [user]);
 
   useEffect(() => {
     // Set up auth state listener
