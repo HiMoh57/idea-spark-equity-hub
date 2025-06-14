@@ -7,30 +7,30 @@ import { Lightbulb, Users, DollarSign, TrendingUp, CheckCircle, ArrowRight } fro
 
 const HowItWorks = () => {
   const steps = [
-    {
-      icon: <Lightbulb className="h-8 w-8 text-blue-600" />,
-      title: "Submit Your Idea",
-      description: "Share your innovative business ideas with our community of entrepreneurs and investors.",
-      details: "Create a detailed pitch including your concept, target market, and potential impact."
-    },
-    {
-      icon: <Users className="h-8 w-8 text-purple-600" />,
-      title: "Community Review",
-      description: "Get feedback, suggestions, and validation from experienced entrepreneurs and industry experts.",
-      details: "Engage with community members who can provide valuable insights and constructive criticism."
-    },
-    {
-      icon: <DollarSign className="h-8 w-8 text-green-600" />,
-      title: "Attract Investment",
-      description: "Connect with potential investors who are interested in funding your innovative ideas.",
-      details: "Present your refined concept to investors looking for the next big opportunity."
-    },
-    {
-      icon: <TrendingUp className="h-8 w-8 text-orange-600" />,
-      title: "Scale Your Business",
-      description: "Get the support and resources you need to turn your idea into a successful business.",
-      details: "Access mentorship, partnerships, and additional funding to grow your venture."
-    }
+   {
+  icon: <Lightbulb className="h-8 w-8 text-blue-600" />,
+  title: "List Your Idea",
+  description: "Got a startup spark? Submit your one-liner teaser — keep it short, sharp, and secret-safe.",
+  details: "Don't worry about revealing everything. You stay in control and approve who gets full access."
+},
+{
+  icon: <Users className="h-8 w-8 text-purple-600" />,
+  title: "Get Discovered",
+  description: "Your idea teaser is shown to builders, founders, and investors who are actively looking.",
+  details: "If they're interested, they request access. You choose whether to approve or decline."
+},
+{
+  icon: <DollarSign className="h-8 w-8 text-green-600" />,
+  title: "Earn From Your Ideas",
+  description: "Charge a small fee to unlock your idea — and get 3–5% equity if someone brings it to life.",
+  details: "Build passive ownership in startups without needing to execute every idea yourself."
+},
+{
+  icon: <TrendingUp className="h-8 w-8 text-orange-600" />,
+  title: "Grow Your Reputation",
+  description: "Track which ideas are trending and see your profile grow as a visionary innovator.",
+  details: "Gain credibility, build a portfolio, and turn creativity into real-world impact."
+}
   ];
 
   const features = [
@@ -118,25 +118,25 @@ const HowItWorks = () => {
             <div className="grid grid-cols-2 gap-6">
               <Card className="bg-gradient-to-br from-blue-500 to-blue-600 text-white border-0">
                 <CardContent className="p-6 text-center">
-                  <div className="text-3xl font-bold mb-2">10K+</div>
+                  <div className="text-3xl font-bold mb-2">30+</div>
                   <div className="text-blue-100">Ideas Submitted</div>
                 </CardContent>
               </Card>
               <Card className="bg-gradient-to-br from-purple-500 to-purple-600 text-white border-0">
                 <CardContent className="p-6 text-center">
-                  <div className="text-3xl font-bold mb-2">500+</div>
+                  <div className="text-3xl font-bold mb-2">10+</div>
                   <div className="text-purple-100">Active Investors</div>
                 </CardContent>
               </Card>
               <Card className="bg-gradient-to-br from-green-500 to-green-600 text-white border-0">
                 <CardContent className="p-6 text-center">
-                  <div className="text-3xl font-bold mb-2">$2M+</div>
+                  <div className="text-3xl font-bold mb-2">0+</div>
                   <div className="text-green-100">Funding Raised</div>
                 </CardContent>
               </Card>
               <Card className="bg-gradient-to-br from-orange-500 to-orange-600 text-white border-0">
                 <CardContent className="p-6 text-center">
-                  <div className="text-3xl font-bold mb-2">150+</div>
+                  <div className="text-3xl font-bold mb-2">05+</div>
                   <div className="text-orange-100">Success Stories</div>
                 </CardContent>
               </Card>
@@ -152,7 +152,7 @@ const HowItWorks = () => {
                 Ready to Transform Your Idea?
               </h2>
               <p className="text-blue-100 text-lg mb-8 max-w-2xl mx-auto">
-                Join thousands of entrepreneurs who have successfully launched their businesses through IdeoPark.
+                Join entrepreneurs who have successfully launched their businesses through IdeoPark.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <button className="bg-white text-blue-600 px-8 py-3 rounded-xl font-semibold hover:bg-blue-50 transition-colors duration-300">
