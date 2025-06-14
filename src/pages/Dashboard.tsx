@@ -78,18 +78,27 @@ const Dashboard = () => {
         setAccessRequests(requestsData || []);
         setProposals(proposalsData || []);
       } else {
-        // For executors, get count of purchased ideas
-        const { data: purchasedData } = await supabase
+        // For executors, get count of purchased ideas (FIX: don't check status = 'approved', just verified payment)
+        const { data: purchasedData, error: purchasedError } = await supabase
           .from('access_requests')
           .select(`
             id,
             payment_verifications!inner(verification_status)
           `)
           .eq('requester_id', user.id)
-          .eq('status', 'approved')
           .eq('payment_verifications.verification_status', 'verified');
 
-        setPurchasedIdeasCount(purchasedData?.length || 0);
+        // If query fails, report error
+        if (purchasedError) {
+          toast({
+            title: "Error loading purchased ideas count",
+            description: purchasedError.message,
+            variant: "destructive"
+          });
+          setPurchasedIdeasCount(0);
+        } else {
+          setPurchasedIdeasCount(purchasedData?.length || 0);
+        }
       }
 
       // Fetch notifications
