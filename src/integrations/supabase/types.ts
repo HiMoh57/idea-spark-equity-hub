@@ -50,6 +50,27 @@ export type Database = {
           },
         ]
       }
+      announcements: {
+        Row: {
+          content: string
+          created_at: string | null
+          id: string
+          title: string
+        }
+        Insert: {
+          content: string
+          created_at?: string | null
+          id?: string
+          title: string
+        }
+        Update: {
+          content?: string
+          created_at?: string | null
+          id?: string
+          title?: string
+        }
+        Relationships: []
+      }
       idea_comments: {
         Row: {
           comment: string
@@ -148,6 +169,7 @@ export type Database = {
       }
       ideas: {
         Row: {
+          attachments: string[] | null
           category: string
           created_at: string
           creator_id: string
@@ -155,14 +177,19 @@ export type Database = {
           equity_percentage: number | null
           id: string
           interests: number | null
+          market_size: string | null
+          problem_description: string | null
           status: string | null
           tags: string[] | null
           teaser: string
           title: string
           updated_at: string
+          validation_methods: string[] | null
+          validation_source: string | null
           views: number | null
         }
         Insert: {
+          attachments?: string[] | null
           category: string
           created_at?: string
           creator_id: string
@@ -170,14 +197,19 @@ export type Database = {
           equity_percentage?: number | null
           id?: string
           interests?: number | null
+          market_size?: string | null
+          problem_description?: string | null
           status?: string | null
           tags?: string[] | null
           teaser: string
           title: string
           updated_at?: string
+          validation_methods?: string[] | null
+          validation_source?: string | null
           views?: number | null
         }
         Update: {
+          attachments?: string[] | null
           category?: string
           created_at?: string
           creator_id?: string
@@ -185,11 +217,15 @@ export type Database = {
           equity_percentage?: number | null
           id?: string
           interests?: number | null
+          market_size?: string | null
+          problem_description?: string | null
           status?: string | null
           tags?: string[] | null
           teaser?: string
           title?: string
           updated_at?: string
+          validation_methods?: string[] | null
+          validation_source?: string | null
           views?: number | null
         }
         Relationships: []
@@ -318,29 +354,41 @@ export type Database = {
       profiles: {
         Row: {
           bio: string | null
-          created_at: string
+          created_at: string | null
           experience: string | null
           full_name: string | null
           id: string
-          updated_at: string
+          interested_tags: string[] | null
+          newsletter_email: string | null
+          profile_complete: boolean | null
+          updated_at: string | null
+          user_goal: string | null
           user_type: string | null
         }
         Insert: {
           bio?: string | null
-          created_at?: string
+          created_at?: string | null
           experience?: string | null
           full_name?: string | null
           id: string
-          updated_at?: string
+          interested_tags?: string[] | null
+          newsletter_email?: string | null
+          profile_complete?: boolean | null
+          updated_at?: string | null
+          user_goal?: string | null
           user_type?: string | null
         }
         Update: {
           bio?: string | null
-          created_at?: string
+          created_at?: string | null
           experience?: string | null
           full_name?: string | null
           id?: string
-          updated_at?: string
+          interested_tags?: string[] | null
+          newsletter_email?: string | null
+          profile_complete?: boolean | null
+          updated_at?: string | null
+          user_goal?: string | null
           user_type?: string | null
         }
         Relationships: []
@@ -471,6 +519,10 @@ export type Database = {
       increment_idea_views: {
         Args: { idea_uuid: string; viewer_ip?: unknown }
         Returns: undefined
+      }
+      is_idea_validated: {
+        Args: { idea_id: string }
+        Returns: boolean
       }
       toggle_idea_interest: {
         Args: { idea_uuid: string }

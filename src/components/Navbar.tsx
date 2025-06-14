@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -22,71 +23,76 @@ const Navbar = () => {
   };
 
   return (
-    <nav className="bg-white/80 backdrop-blur-md border-b border-slate-200 sticky top-0 z-50">
+    <nav className="bg-white/80 backdrop-blur-xl border-b border-white/20 sticky top-0 z-50 shadow-lg shadow-blue-500/10">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-16">
-          <Link to="/" className="flex items-center space-x-2">
-            <div className="bg-gradient-to-r from-blue-600 to-purple-600 p-2 rounded-lg shadow-md">
-              <Lightbulb className="h-6 w-6 text-white" />
+        <div className="flex justify-between items-center h-20">
+          <Link to="/" className="flex items-center space-x-3 group">
+            <div className="relative">
+              <div className="bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 p-3 rounded-2xl shadow-lg group-hover:shadow-xl transition-all duration-300 group-hover:scale-105">
+                <Lightbulb className="h-7 w-7 text-white" />
+              </div>
+              <div className="absolute -top-1 -right-1 w-4 h-4 bg-gradient-to-r from-yellow-400 to-orange-400 rounded-full animate-pulse" />
             </div>
-            <span className="text-2xl font-extrabold text-slate-900 tracking-tight">Ideopark</span>
+            <div className="flex flex-col">
+              <span className="text-2xl font-bold bg-gradient-to-r from-slate-900 to-slate-700 bg-clip-text text-transparent tracking-tight">
+                IdeoPark
+              </span>
+              <span className="text-xs text-slate-500 font-medium -mt-1">Silicon Valley</span>
+            </div>
           </Link>
           
-          <div className="hidden md:flex items-center space-x-8 lg:space-x-12">
-            <Link to="/explore" className="text-lg font-medium text-slate-600 hover:text-blue-600 transition-colors duration-200">
-              Explore Ideas
-            </Link>
-            {user && (
-              <Link to="/submit-idea" className="text-lg font-medium text-slate-600 hover:text-blue-600 transition-colors duration-200">
-                Submit Idea
+          <div className="hidden md:flex items-center space-x-1 lg:space-x-2">
+            {[
+              { to: "/explore", label: "Explore Ideas" },
+              ...(user ? [{ to: "/submit-idea", label: "Submit Idea" }] : []),
+              ...(user ? [{ to: "/announcements", label: "Announcements" }] : []),
+              { to: "/pricing", label: "Pricing" },
+              { to: "/dashboard", label: "Dashboard" }
+            ].map((item) => (
+              <Link
+                key={item.to}
+                to={item.to}
+                className="relative px-4 py-2 text-slate-700 hover:text-blue-600 transition-all duration-300 font-medium group rounded-xl hover:bg-blue-50/50"
+              >
+                {item.label}
+                <div className="absolute inset-x-0 bottom-0 h-0.5 bg-gradient-to-r from-blue-600 to-purple-600 scale-x-0 group-hover:scale-x-100 transition-transform duration-300 rounded-full" />
               </Link>
-            )}
-            {user && (
-              <Link to="/announcements" className="text-lg font-medium text-slate-600 hover:text-blue-600 transition-colors duration-200">
-                Announcements
-              </Link>
-            )}
-            <Link to="/pricing" className="text-lg font-medium text-slate-600 hover:text-blue-600 transition-colors duration-200">
-              Pricing
-            </Link>
-
-            <Link to="/dashboard" className="text-lg font-medium text-slate-600 hover:text-blue-600 transition-colors duration-200">
-              Dashboard
-            </Link>
+            ))}
             
             {user ? (
-              <div className="flex items-center space-x-4">
+              <div className="flex items-center space-x-4 ml-6">
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" className="relative h-9 w-9 rounded-full">
-                      <div className="h-9 w-9 rounded-full bg-blue-500 flex items-center justify-center text-white font-semibold text-lg">
+                    <Button variant="ghost" className="relative h-12 w-12 rounded-full hover:scale-105 transition-transform duration-300">
+                      <div className="h-12 w-12 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 flex items-center justify-center text-white font-bold text-lg shadow-lg hover:shadow-xl transition-shadow duration-300">
                         {profile?.full_name ? profile.full_name[0].toUpperCase() : user.email ? user.email[0].toUpperCase() : 'U'}
                       </div>
+                      <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 border-2 border-white rounded-full" />
                     </Button>
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent className="w-56" align="end" forceMount>
-                    <DropdownMenuLabel className="font-normal">
-                      <div className="flex flex-col space-y-1">
-                        <p className="text-sm font-medium leading-none">{profile?.full_name || "User"}</p>
-                        <p className="text-xs leading-none text-muted-foreground">
+                  <DropdownMenuContent className="w-64 bg-white/95 backdrop-blur-xl border border-white/20 shadow-2xl" align="end" forceMount>
+                    <DropdownMenuLabel className="font-normal p-4">
+                      <div className="flex flex-col space-y-2">
+                        <p className="text-sm font-semibold leading-none text-slate-900">{profile?.full_name || "User"}</p>
+                        <p className="text-xs leading-none text-slate-500 bg-slate-100 px-2 py-1 rounded-lg">
                           {user.email}
                         </p>
                       </div>
                     </DropdownMenuLabel>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem onClick={handleSignOut} className="cursor-pointer">
-                      <LogOut className="mr-2 h-4 w-4" />
+                    <DropdownMenuSeparator className="bg-slate-200" />
+                    <DropdownMenuItem onClick={handleSignOut} className="cursor-pointer p-3 hover:bg-red-50 text-red-600 font-medium">
+                      <LogOut className="mr-3 h-4 w-4" />
                       <span>Sign Out</span>
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
               </div>
             ) : (
-              <div className="flex items-center space-x-4">
-                <Button asChild variant="ghost" className="text-lg px-6 py-2">
+              <div className="flex items-center space-x-4 ml-6">
+                <Button asChild variant="ghost" className="text-lg px-6 py-3 font-medium hover:bg-slate-100 rounded-xl transition-all duration-300">
                   <Link to="/auth">Login</Link>
                 </Button>
-                <Button asChild className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-lg px-6 py-2 rounded-lg shadow-md">
+                <Button asChild className="bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 hover:from-blue-700 hover:via-purple-700 hover:to-indigo-700 text-lg px-8 py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 font-semibold">
                   <Link to="/auth">Get Started</Link>
                 </Button>
               </div>
@@ -97,16 +103,16 @@ const Navbar = () => {
           <div className="md:hidden flex items-center">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="icon">
+                <Button variant="ghost" size="icon" className="hover:bg-slate-100 rounded-xl">
                   <Menu className="h-6 w-6" />
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent className="w-56" align="end" forceMount>
-                <DropdownMenuLabel className="font-normal">
+              <DropdownMenuContent className="w-64 bg-white/95 backdrop-blur-xl border border-white/20 shadow-2xl" align="end" forceMount>
+                <DropdownMenuLabel className="font-normal p-4">
                   <div className="flex flex-col space-y-1">
-                    <p className="text-sm font-medium leading-none">{user ? (profile?.full_name || "User") : "Guest"}</p>
+                    <p className="text-sm font-semibold leading-none">{user ? (profile?.full_name || "User") : "Guest"}</p>
                     {user?.email && (
-                      <p className="text-xs leading-none text-muted-foreground">
+                      <p className="text-xs leading-none text-slate-500 bg-slate-100 px-2 py-1 rounded-lg">
                         {user.email}
                       </p>
                     )}
@@ -114,37 +120,37 @@ const Navbar = () => {
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem asChild>
-                  <Link to="/explore">Explore Ideas</Link>
+                  <Link to="/explore" className="p-3">Explore Ideas</Link>
                 </DropdownMenuItem>
                 {user && (
                   <DropdownMenuItem asChild>
-                    <Link to="/submit-idea">Submit Idea</Link>
+                    <Link to="/submit-idea" className="p-3">Submit Idea</Link>
                   </DropdownMenuItem>
                 )}
                 {user && (
                   <DropdownMenuItem asChild>
-                    <Link to="/announcements">Announcements</Link>
+                    <Link to="/announcements" className="p-3">Announcements</Link>
                   </DropdownMenuItem>
                 )}
                 <DropdownMenuItem asChild>
-                  <Link to="/pricing">Pricing</Link>
+                  <Link to="/pricing" className="p-3">Pricing</Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
-                  <Link to="/dashboard">Dashboard</Link>
+                  <Link to="/dashboard" className="p-3">Dashboard</Link>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 {user ? (
-                  <DropdownMenuItem onClick={handleSignOut} className="cursor-pointer">
+                  <DropdownMenuItem onClick={handleSignOut} className="cursor-pointer p-3 text-red-600">
                     <LogOut className="mr-2 h-4 w-4" />
                     <span>Sign Out</span>
                   </DropdownMenuItem>
                 ) : (
                   <>
                     <DropdownMenuItem asChild>
-                      <Link to="/auth">Login</Link>
+                      <Link to="/auth" className="p-3">Login</Link>
                     </DropdownMenuItem>
                     <DropdownMenuItem asChild>
-                      <Link to="/auth">Get Started</Link>
+                      <Link to="/auth" className="p-3 font-semibold text-blue-600">Get Started</Link>
                     </DropdownMenuItem>
                   </>
                 )}
