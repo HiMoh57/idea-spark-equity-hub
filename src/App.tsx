@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -15,6 +16,7 @@ import Pricing from "./pages/Pricing";
 import PaymentSuccess from "./pages/PaymentSuccess";
 import NotFound from "./pages/NotFound";
 import AnnouncementsPage from "./pages/AnnouncementsPage";
+import HowItWorks from "./pages/HowItWorks";
 import RealtimeNotifications from "./components/RealtimeNotifications";
 import { useAuth } from '@/hooks/useAuth';
 import OnboardingModal from '@/components/OnboardingModal';
@@ -36,6 +38,7 @@ const App = () => {
             <Route path="/auth" element={<Auth />} />
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/explore" element={<Explore />} />
+            <Route path="/how-it-works" element={<HowItWorks />} />
             <Route path="/submit-idea" element={<SubmitIdea />} />
             <Route path="/terms" element={<Terms />} />
             <Route path="/privacy" element={<Privacy />} />
