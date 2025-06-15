@@ -243,7 +243,7 @@ const SubmitIdea = () => {
     setUploading(true);
 
     try {
-      // Upload files first (keeping existing upload logic)
+      // Upload files first
       const fileUrls = [];
       for (const file of formData.attachments) {
         const fileExt = file.name.split('.').pop();
@@ -263,70 +263,59 @@ const SubmitIdea = () => {
         fileUrls.push(publicUrl);
       }
 
-      // Submit idea using the API endpoint to maintain existing functionality
-      const response = await fetch('/api/submit-idea', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
+      // Submit idea directly to Supabase
+      const { error } = await supabase
+        .from('ideas')
+        .insert({
+          creator_id: user.id,
           title: formData.title,
           teaser: formData.teaser,
-          problem_description: formData.problemDescription,
           description: formData.description,
           category: formData.category,
           tags: formData.tags,
-          userId: user.id,
           equity_percentage: formData.equityPercentage,
           attachments: fileUrls,
+          problem_description: formData.problemDescription,
           validation_source: formData.validationSource,
           market_size: formData.marketSize,
           validation_methods: formData.validationMethods
-        }),
+        });
+
+      if (error) throw error;
+
+      // Delete incomplete submission if it exists
+      if (incompleteSubmissionId) {
+        await supabase
+          .from('incomplete_submissions')
+          .delete()
+          .eq('id', incompleteSubmissionId);
+      }
+
+      toast({
+        title: "Idea submitted successfully!",
+        description: "Your idea is now under review and will be published automatically once approved.",
       });
 
-      if (response.ok) {
-        // Delete incomplete submission if it exists
-        if (incompleteSubmissionId) {
-          await supabase
-            .from('incomplete_submissions')
-            .delete()
-            .eq('id', incompleteSubmissionId);
-        }
-
-        toast({
-          title: "Idea submitted successfully!",
-          description: "Your idea is now under review and will be published automatically once approved.",
-        });
-
-        // Reset form
-        setFormData({
-          title: '',
-          teaser: '',
-          description: '',
-          category: '',
-          tags: [],
-          newTag: '',
-          equityPercentage: 5,
-          attachments: [],
-          terms: false,
-          problemDescription: '',
-          validationSource: '',
-          marketSize: '',
-          validationMethods: []
-        });
-        setStep(1);
-        
-        // Show post-submit modal instead of navigating immediately
-        setShowPostSubmitModal(true);
-      } else {
-        const errorData = await response.json();
-        toast({
-          title: "Error",
-          description: errorData.message || "Failed to submit idea.",
-          variant: "destructive",
-        });
-      }
+      // Reset form
+      setFormData({
+        title: '',
+        teaser: '',
+        description: '',
+        category: '',
+        tags: [],
+        newTag: '',
+        equityPercentage: 5,
+        attachments: [],
+        terms: false,
+        problemDescription: '',
+        validationSource: '',
+        marketSize: '',
+        validationMethods: []
+      });
+      setStep(1);
+      
+      // Show post-submit modal
+      setShowPostSubmitModal(true);
     } catch (error: any) {
       toast({
         title: "Error submitting idea",
