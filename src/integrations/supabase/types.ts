@@ -289,6 +289,42 @@ export type Database = {
         }
         Relationships: []
       }
+      incomplete_submissions: {
+        Row: {
+          category: string | null
+          created_at: string
+          description: string | null
+          email: string
+          id: string
+          reminder_sent: boolean
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          category?: string | null
+          created_at?: string
+          description?: string | null
+          email: string
+          id?: string
+          reminder_sent?: boolean
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          category?: string | null
+          created_at?: string
+          description?: string | null
+          email?: string
+          id?: string
+          reminder_sent?: boolean
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       messages: {
         Row: {
           content: string
