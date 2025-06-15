@@ -1,12 +1,13 @@
 
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState } from 'react';
 
 interface ModalContextType {
   showWelcomeModal: boolean;
   showExitIntentModal: boolean;
   hasInteractedWithForm: boolean;
+  intendedPath: string | null;
   setShowWelcomeModal: (show: boolean) => void;
-  setShowExitIntentModal: (show: boolean) => void;
+  showExitIntentModalWithPath: (path: string | null) => void;
   setHasInteractedWithForm: (interacted: boolean) => void;
   dismissWelcomeModal: () => void;
   dismissExitIntentModal: () => void;
@@ -26,6 +27,7 @@ export const ModalProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const [showWelcomeModal, setShowWelcomeModal] = useState(false);
   const [showExitIntentModal, setShowExitIntentModal] = useState(false);
   const [hasInteractedWithForm, setHasInteractedWithForm] = useState(false);
+  const [intendedPath, setIntendedPath] = useState<string | null>(null);
 
   const dismissWelcomeModal = () => {
     setShowWelcomeModal(false);
@@ -33,10 +35,16 @@ export const ModalProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     sessionStorage.setItem('welcomeModalShown', 'true');
   };
 
+  const showExitIntentModalWithPath = (path: string | null) => {
+    setIntendedPath(path);
+    setShowExitIntentModal(true);
+  };
+
   const dismissExitIntentModal = () => {
     setShowExitIntentModal(false);
     // Reset form interaction state when modal is dismissed
     setHasInteractedWithForm(false);
+    setIntendedPath(null);
   };
 
   return (
@@ -45,8 +53,9 @@ export const ModalProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         showWelcomeModal,
         showExitIntentModal,
         hasInteractedWithForm,
+        intendedPath,
         setShowWelcomeModal,
-        setShowExitIntentModal,
+        showExitIntentModalWithPath,
         setHasInteractedWithForm,
         dismissWelcomeModal,
         dismissExitIntentModal,

@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -40,7 +39,7 @@ const SubmitIdea = () => {
   const { user, loading: authLoading } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
-  const { setHasInteractedWithForm, setShowExitIntentModal, hasInteractedWithForm } = useModal();
+  const { setHasInteractedWithForm, showExitIntentModalWithPath, hasInteractedWithForm } = useModal();
   const [step, setStep] = useState(1);
   const [submitting, setSubmitting] = useState(false);
   const [uploading, setUploading] = useState(false);
@@ -79,12 +78,8 @@ const SubmitIdea = () => {
 
   // Set up exit intent detection
   useExitIntent({
-    onExitIntent: () => {
-      if (hasInteractedWithForm && !user) {
-        setShowExitIntentModal(true);
-      }
-    },
-    isEnabled: hasInteractedWithForm && !user
+    onExitIntent: showExitIntentModalWithPath,
+    isEnabled: hasInteractedWithForm && !user,
   });
 
   // Check form interaction whenever formData changes

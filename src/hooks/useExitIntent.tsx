@@ -1,60 +1,60 @@
 
 import { useEffect } from 'react';
-import { useLocation } from 'react-router-dom';
 
 interface UseExitIntentProps {
-  onExitIntent: () => void;
+  onExitIntent: (path: string | null) => void;
   isEnabled: boolean;
 }
 
 export const useExitIntent = ({ onExitIntent, isEnabled }: UseExitIntentProps) => {
-  const location = useLocation();
-
   useEffect(() => {
     if (!isEnabled) return;
 
     let hasTriggered = false;
 
-    const handleMouseLeave = (e: MouseEvent) => {
-      // Only trigger if mouse is leaving from the top of the page
-      if (e.clientY <= 0 && !hasTriggered) {
+    const triggerOnce = (path: string | null = null) => {
+      if (!hasTriggered) {
         hasTriggered = true;
-        onExitIntent();
+        onExitIntent(path);
+      }
+    };
+
+    const handleMouseLeave = (e: MouseEvent) => {
+      if (e.clientY <= 0) {
+        triggerOnce();
       }
     };
 
     const handleBeforeUnload = (e: BeforeUnloadEvent) => {
-      if (!hasTriggered) {
-        hasTriggered = true;
-        onExitIntent();
-        // This will show browser's default confirmation dialog
-        e.preventDefault();
-        e.returnValue = '';
-      }
+      triggerOnce();
+      e.preventDefault();
+      e.returnValue = '';
     };
 
-    // Handle navigation within the app
     const handlePopState = () => {
-      if (!hasTriggered && isEnabled) {
-        hasTriggered = true;
-        onExitIntent();
-      }
+      triggerOnce();
     };
 
-    // Handle clicks on links that would navigate away
     const handleLinkClick = (e: MouseEvent) => {
       const target = e.target as HTMLElement;
-      const link = target.closest('a, [role="button"]');
-      
-      if (link && !hasTriggered && isEnabled) {
-        // Check if it's a navigation link (not just any button)
-        const href = link.getAttribute('href');
-        const role = link.getAttribute('role');
-        
-        if (href || role === 'button') {
-          hasTriggered = true;
+      const link = target.closest('a');
+
+      if (link && link.href) {
+        if (link.target === '_blank' || e.ctrlKey || e.metaKey || e.shiftKey) {
+          return;
+        }
+
+        if (link.pathname === window.location.pathname && link.hash) {
+          return;
+        }
+
+        const isInternalNav = link.origin === window.location.origin;
+        if (isInternalNav && link.pathname !== window.location.pathname) {
           e.preventDefault();
-          onExitIntent();
+          triggerOnce(link.pathname + link.search + link.hash);
+        } else if (!isInternalNav) {
+          e.preventDefault();
+          triggerOnce(link.href);
         }
       }
     };
@@ -70,5 +70,5 @@ export const useExitIntent = ({ onExitIntent, isEnabled }: UseExitIntentProps) =
       window.removeEventListener('popstate', handlePopState);
       document.removeEventListener('click', handleLinkClick, true);
     };
-  }, [onExitIntent, isEnabled, location]);
+  }, [onExitIntent, isEnabled]);
 };

@@ -7,7 +7,7 @@ import { useNavigate } from 'react-router-dom';
 import { Star, Heart, Shield } from 'lucide-react';
 
 const ExitIntentModal = () => {
-  const { showExitIntentModal, dismissExitIntentModal } = useModal();
+  const { showExitIntentModal, dismissExitIntentModal, intendedPath } = useModal();
   const navigate = useNavigate();
 
   const handleLoginToSave = () => {
@@ -17,8 +17,12 @@ const ExitIntentModal = () => {
 
   const handleLeaveAnyway = () => {
     dismissExitIntentModal();
-    // Navigate to home page when leaving anyway
-    navigate('/');
+    if (intendedPath) {
+      navigate(intendedPath);
+    } else {
+      // Default behavior for back button or mouse leave
+      navigate('/');
+    }
   };
 
   return (
