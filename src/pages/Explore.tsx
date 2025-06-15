@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -57,11 +56,7 @@ const Explore = () => {
           interests,
           created_at,
           creator_id,
-          equity_percentage,
-          profiles!creator_id (
-            full_name,
-            is_verified_poster
-          )
+          equity_percentage
         `)
         .eq('status', 'approved');
 
@@ -78,7 +73,28 @@ const Explore = () => {
 
       if (ideasError) throw ideasError;
 
-      setIdeas(ideasData || []);
+      // Fetch profiles separately for the creators
+      if (ideasData && ideasData.length > 0) {
+        const creatorIds = [...new Set(ideasData.map(idea => idea.creator_id))];
+        const { data: profilesData, error: profilesError } = await supabase
+          .from('profiles')
+          .select('id, full_name, is_verified_poster')
+          .in('id', creatorIds);
+
+        if (profilesError) {
+          console.error('Error fetching profiles:', profilesError);
+        }
+
+        // Merge the profile data with ideas
+        const ideasWithProfiles = ideasData.map(idea => ({
+          ...idea,
+          profiles: profilesData?.find(profile => profile.id === idea.creator_id) || null
+        }));
+
+        setIdeas(ideasWithProfiles);
+      } else {
+        setIdeas([]);
+      }
     } catch (error: any) {
       toast({
         title: "Error loading ideas",
