@@ -36,6 +36,8 @@ interface FormData {
   validationMethods: string[];
 }
 
+const marketSizes = ['Small', 'Medium', 'Large']; // added for dropdown
+
 const SubmitIdea = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
@@ -62,7 +64,7 @@ const SubmitIdea = () => {
     terms: false,
     problemDescription: '',
     validationSource: '',
-    marketSize: '',
+    marketSize: '', // no change (initialize as empty)
     validationMethods: []
   });
 
@@ -188,17 +190,16 @@ const SubmitIdea = () => {
         }
         break;
       case 2:
-        // Make sure "marketSize" is not empty or whitespace
+        // Market Size must be one of the allowed dropdown values
         if (
           !formData.problemDescription ||
           !formData.validationSource ||
-          !formData.marketSize ||
+          !marketSizes.includes(formData.marketSize) || // <-- update validation
           formData.validationMethods.length === 0
         ) {
           let msg = "Please provide all validation details to ensure your idea is well-researched.";
-          // Additional error message if market size is just whitespace
-          if (!formData.marketSize || formData.marketSize.trim() === "") {
-            msg = "Market Size is required and cannot be blank. Please provide a value.";
+          if (!marketSizes.includes(formData.marketSize)) {
+            msg = "Please select a valid Market Size (Small, Medium, Large).";
           }
           toast({
             title: "Missing Validation Information",
@@ -483,13 +484,19 @@ const SubmitIdea = () => {
                     </div>
                     <div>
                       <Label htmlFor="marketSize">Market Size</Label>
-                      <Input
-                        id="marketSize"
+                      <Select
                         value={formData.marketSize}
-                        onChange={(e) => setFormData({ ...formData, marketSize: e.target.value })}
-                        placeholder="Estimated market size"
-                        required
-                      />
+                        onValueChange={(value) => setFormData({ ...formData, marketSize: value })}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select market size" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {marketSizes.map(size => (
+                            <SelectItem key={size} value={size}>{size}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
                     </div>
                     <div>
                       <Label>Validation Methods</Label>
