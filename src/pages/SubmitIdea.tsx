@@ -1,9 +1,11 @@
+
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { useNavigate } from 'react-router-dom';
 import { useExitIntent } from '@/hooks/useExitIntent';
 import { useModal } from '@/contexts/ModalContext';
 import ProgressSaveModal from '@/components/ProgressSaveModal';
+import PostSubmitModal from '@/components/PostSubmitModal';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { Button } from '@/components/ui/button';
@@ -13,6 +15,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { toast } from '@/components/ui/use-toast';
 import { ArrowRight } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
 
 const SubmitIdea = () => {
   const { user } = useAuth();
@@ -26,6 +29,8 @@ const SubmitIdea = () => {
   
   const [hasInteracted, setHasInteracted] = useState(false);
   const [showProgressModal, setShowProgressModal] = useState(false);
+  const [showPostSubmitModal, setShowPostSubmitModal] = useState(false);
+  const [incompleteSubmissionId, setIncompleteSubmissionId] = useState<string | null>(null);
 
   // Track form interaction for unauthenticated users
   useEffect(() => {
@@ -57,6 +62,45 @@ const SubmitIdea = () => {
       });
     };
   }, [user, hasInteracted]);
+
+  // Track incomplete submissions for email reminders
+  useEffect(() => {
+    if (!user) return;
+
+    const timer = setTimeout(() => {
+      if (title || description || category) {
+        saveIncompleteSubmission();
+      }
+    }, 10000); // Save after 10 seconds of inactivity
+
+    return () => clearTimeout(timer);
+  }, [title, description, category, user]);
+
+  const saveIncompleteSubmission = async () => {
+    if (!user || !title) return;
+
+    try {
+      const { data, error } = await supabase
+        .from('incomplete_submissions')
+        .upsert({
+          user_id: user.id,
+          email: user.email,
+          title,
+          description,
+          category,
+          updated_at: new Date().toISOString()
+        }, {
+          onConflict: 'user_id'
+        })
+        .select()
+        .single();
+
+      if (error) throw error;
+      setIncompleteSubmissionId(data.id);
+    } catch (error) {
+      console.error('Error saving incomplete submission:', error);
+    }
+  };
 
   useExitIntent({
     onExitIntent: (path) => {
@@ -95,11 +139,21 @@ const SubmitIdea = () => {
       });
 
       if (response.ok) {
+        // Delete incomplete submission if it exists
+        if (incompleteSubmissionId) {
+          await supabase
+            .from('incomplete_submissions')
+            .delete()
+            .eq('id', incompleteSubmissionId);
+        }
+
         toast({
           title: "Success",
           description: "Your idea has been submitted!",
         });
-        navigate('/dashboard');
+        
+        // Show post-submit modal instead of navigating immediately
+        setShowPostSubmitModal(true);
       } else {
         const errorData = await response.json();
         toast({
@@ -117,6 +171,16 @@ const SubmitIdea = () => {
     } finally {
       setIsSubmitting(false);
     }
+  };
+
+  const getUserProfileLink = () => {
+    const baseUrl = window.location.origin;
+    return `${baseUrl}/profile/${user?.id}`;
+  };
+
+  const handlePostSubmitClose = () => {
+    setShowPostSubmitModal(false);
+    navigate('/dashboard');
   };
 
   return (
@@ -214,6 +278,12 @@ const SubmitIdea = () => {
           setShowProgressModal(false);
           navigate('/auth');
         }}
+      />
+
+      <PostSubmitModal
+        isOpen={showPostSubmitModal}
+        onClose={handlePostSubmitClose}
+        userProfileLink={getUserProfileLink()}
       />
     </div>
   );
