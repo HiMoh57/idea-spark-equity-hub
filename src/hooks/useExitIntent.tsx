@@ -1,6 +1,6 @@
 
 import { useEffect } from 'react';
-import { useBlocker } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 
 interface UseExitIntentProps {
   onExitIntent: () => void;
@@ -8,11 +8,7 @@ interface UseExitIntentProps {
 }
 
 export const useExitIntent = ({ onExitIntent, isEnabled }: UseExitIntentProps) => {
-  // Block navigation when enabled
-  const blocker = useBlocker(
-    ({ currentLocation, nextLocation }) =>
-      isEnabled && currentLocation.pathname !== nextLocation.pathname
-  );
+  const location = useLocation();
 
   useEffect(() => {
     if (!isEnabled) return;
@@ -37,19 +33,42 @@ export const useExitIntent = ({ onExitIntent, isEnabled }: UseExitIntentProps) =
       }
     };
 
+    // Handle navigation within the app
+    const handlePopState = () => {
+      if (!hasTriggered && isEnabled) {
+        hasTriggered = true;
+        onExitIntent();
+      }
+    };
+
+    // Handle clicks on links that would navigate away
+    const handleLinkClick = (e: MouseEvent) => {
+      const target = e.target as HTMLElement;
+      const link = target.closest('a, [role="button"]');
+      
+      if (link && !hasTriggered && isEnabled) {
+        // Check if it's a navigation link (not just any button)
+        const href = link.getAttribute('href');
+        const role = link.getAttribute('role');
+        
+        if (href || role === 'button') {
+          hasTriggered = true;
+          e.preventDefault();
+          onExitIntent();
+        }
+      }
+    };
+
     document.addEventListener('mouseleave', handleMouseLeave);
     window.addEventListener('beforeunload', handleBeforeUnload);
+    window.addEventListener('popstate', handlePopState);
+    document.addEventListener('click', handleLinkClick, true);
 
     return () => {
       document.removeEventListener('mouseleave', handleMouseLeave);
       window.removeEventListener('beforeunload', handleBeforeUnload);
+      window.removeEventListener('popstate', handlePopState);
+      document.removeEventListener('click', handleLinkClick, true);
     };
-  }, [onExitIntent, isEnabled]);
-
-  // Handle blocked navigation
-  useEffect(() => {
-    if (blocker.state === 'blocked') {
-      onExitIntent();
-    }
-  }, [blocker.state, onExitIntent]);
+  }, [onExitIntent, isEnabled, location]);
 };
