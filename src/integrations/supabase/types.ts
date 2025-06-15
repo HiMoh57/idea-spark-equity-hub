@@ -296,7 +296,10 @@ export type Database = {
           description: string | null
           email: string
           id: string
+          problem_description: string | null
           reminder_sent: boolean
+          tags: string | null
+          teaser: string | null
           title: string
           updated_at: string
           user_id: string
@@ -307,7 +310,10 @@ export type Database = {
           description?: string | null
           email: string
           id?: string
+          problem_description?: string | null
           reminder_sent?: boolean
+          tags?: string | null
+          teaser?: string | null
           title: string
           updated_at?: string
           user_id: string
@@ -318,7 +324,10 @@ export type Database = {
           description?: string | null
           email?: string
           id?: string
+          problem_description?: string | null
           reminder_sent?: boolean
+          tags?: string | null
+          teaser?: string | null
           title?: string
           updated_at?: string
           user_id?: string

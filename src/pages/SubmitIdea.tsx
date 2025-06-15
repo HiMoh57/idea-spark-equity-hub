@@ -23,7 +23,10 @@ const SubmitIdea = () => {
   const { showExitIntentModalWithPath } = useModal();
   
   const [title, setTitle] = useState('');
+  const [teaser, setTeaser] = useState('');
+  const [problemDescription, setProblemDescription] = useState('');
   const [description, setDescription] = useState('');
+  const [tags, setTags] = useState('');
   const [category, setCategory] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   
@@ -68,13 +71,13 @@ const SubmitIdea = () => {
     if (!user) return;
 
     const timer = setTimeout(() => {
-      if (title || description || category) {
+      if (title || description || category || teaser || problemDescription || tags) {
         saveIncompleteSubmission();
       }
     }, 10000); // Save after 10 seconds of inactivity
 
     return () => clearTimeout(timer);
-  }, [title, description, category, user]);
+  }, [title, description, category, teaser, problemDescription, tags, user]);
 
   const saveIncompleteSubmission = async () => {
     if (!user || !title) return;
@@ -86,8 +89,11 @@ const SubmitIdea = () => {
           user_id: user.id,
           email: user.email || '',
           title,
+          teaser,
+          problem_description: problemDescription,
           description,
           category,
+          tags,
           updated_at: new Date().toISOString()
         }, {
           onConflict: 'user_id'
@@ -133,8 +139,11 @@ const SubmitIdea = () => {
         },
         body: JSON.stringify({
           title,
+          teaser,
+          problem_description: problemDescription,
           description,
           category,
+          tags: tags.split(',').map(tag => tag.trim()).filter(tag => tag),
           userId: user.id,
         }),
       });
@@ -213,8 +222,40 @@ const SubmitIdea = () => {
               </div>
 
               <div>
+                <Label htmlFor="teaser" className="block text-sm font-medium text-slate-700">
+                  Teaser
+                </Label>
+                <div className="mt-1">
+                  <Input
+                    type="text"
+                    id="teaser"
+                    value={teaser}
+                    onChange={(e) => setTeaser(e.target.value)}
+                    placeholder="A short, one-sentence summary of your idea"
+                    required
+                  />
+                </div>
+              </div>
+
+              <div>
+                <Label htmlFor="problem" className="block text-sm font-medium text-slate-700">
+                  Problem Description
+                </Label>
+                <div className="mt-1">
+                  <Textarea
+                    id="problem"
+                    value={problemDescription}
+                    onChange={(e) => setProblemDescription(e.target.value)}
+                    rows={3}
+                    placeholder="What problem are you solving?"
+                    required
+                  />
+                </div>
+              </div>
+
+              <div>
                 <Label htmlFor="description" className="block text-sm font-medium text-slate-700">
-                  Description
+                  Solution Description
                 </Label>
                 <div className="mt-1">
                   <Textarea
@@ -222,33 +263,51 @@ const SubmitIdea = () => {
                     value={description}
                     onChange={(e) => setDescription(e.target.value)}
                     rows={5}
-                    placeholder="Describe your idea in detail"
+                    placeholder="Describe your solution in detail"
                     required
                   />
                 </div>
               </div>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <Label htmlFor="category" className="block text-sm font-medium text-slate-700">
+                    Category
+                  </Label>
+                  <div className="mt-1">
+                    <Select onValueChange={setCategory} value={category} required>
+                      <SelectTrigger className="w-full">
+                        <SelectValue placeholder="Select a category" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="AI">Artificial Intelligence</SelectItem>
+                        <SelectItem value="Web3">Web3</SelectItem>
+                        <SelectItem value="SaaS">SaaS</SelectItem>
+                        <SelectItem value="HealthTech">HealthTech</SelectItem>
+                        <SelectItem value="EdTech">EdTech</SelectItem>
+                        <SelectItem value="FinTech">FinTech</SelectItem>
+                        <SelectItem value="Other">Other</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
 
-              <div>
-                <Label htmlFor="category" className="block text-sm font-medium text-slate-700">
-                  Category
-                </Label>
-                <div className="mt-1">
-                  <Select onValueChange={setCategory} defaultValue={category}>
-                    <SelectTrigger className="w-full">
-                      <SelectValue placeholder="Select a category" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="AI">Artificial Intelligence</SelectItem>
-                      <SelectItem value="Web3">Web3</SelectItem>
-                      <SelectItem value="SaaS">SaaS</SelectItem>
-                      <SelectItem value="HealthTech">HealthTech</SelectItem>
-                      <SelectItem value="EdTech">EdTech</SelectItem>
-                      <SelectItem value="FinTech">FinTech</SelectItem>
-                      <SelectItem value="Other">Other</SelectItem>
-                    </SelectContent>
-                  </Select>
+                <div>
+                  <Label htmlFor="tags" className="block text-sm font-medium text-slate-700">
+                    Tags
+                  </Label>
+                  <div className="mt-1">
+                    <Input
+                      type="text"
+                      id="tags"
+                      value={tags}
+                      onChange={(e) => setTags(e.target.value)}
+                      placeholder="e.g. b2b, mobile, analytics"
+                    />
+                  </div>
                 </div>
               </div>
+
 
               <div>
                 <Button
