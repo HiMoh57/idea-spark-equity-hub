@@ -11,18 +11,33 @@ const ExitIntentModal = () => {
   const navigate = useNavigate();
 
   const handleLoginToSave = () => {
-    navigate('/auth');
+    console.log('User chose to login/save');
     dismissExitIntentModal();
+    navigate('/auth');
   };
 
   const handleLeaveAnyway = () => {
+    console.log('User chose to leave anyway, intended path:', intendedPath);
     dismissExitIntentModal();
+    
     if (intendedPath) {
-      navigate(intendedPath);
+      // If there's an intended path, navigate to it
+      if (intendedPath.startsWith('http')) {
+        // External link
+        window.location.href = intendedPath;
+      } else {
+        // Internal link
+        navigate(intendedPath);
+      }
     } else {
-      // Default behavior for back button or mouse leave
+      // Back button or mouse leave - go to home
       navigate('/');
     }
+  };
+
+  const handleStayAndContinue = () => {
+    console.log('User chose to stay and continue');
+    dismissExitIntentModal();
   };
 
   return (
@@ -39,7 +54,7 @@ const ExitIntentModal = () => {
         
         <div className="text-center space-y-6 py-6">
           <p className="text-slate-600 text-lg leading-relaxed">
-            We noticed you're leaving without finishing…
+            We noticed you're leaving without finishing your submission...
           </p>
           
           <div className="p-4 bg-gradient-to-r from-blue-50 to-purple-50 rounded-xl border border-blue-200">
@@ -51,24 +66,31 @@ const ExitIntentModal = () => {
           </div>
           
           <p className="text-slate-700 font-medium">
-            Want to save your progress?
+            Want to save your progress and continue later?
           </p>
         </div>
         
         <AlertDialogFooter className="flex flex-col sm:flex-col space-y-3 sm:space-y-3 sm:space-x-0">
           <Button
-            onClick={handleLoginToSave}
+            onClick={handleStayAndContinue}
             className="w-full bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700 text-white font-bold py-3 px-6 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300"
           >
             <Shield className="h-5 w-5 mr-2" />
-            Login to Save My Idea
+            Stay & Continue Working
+          </Button>
+          <Button
+            onClick={handleLoginToSave}
+            variant="outline"
+            className="w-full border-2 border-blue-300 text-blue-600 hover:bg-blue-50 py-3 px-6 rounded-xl transition-all duration-300"
+          >
+            Login to Save Progress
           </Button>
           <Button
             onClick={handleLeaveAnyway}
             variant="ghost"
             className="w-full text-slate-600 hover:text-slate-800 py-3 px-6 rounded-xl hover:bg-slate-100 transition-all duration-300"
           >
-            No Thanks, I'll Leave Anyway
+            Leave Without Saving
           </Button>
         </AlertDialogFooter>
       </AlertDialogContent>

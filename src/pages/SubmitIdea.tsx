@@ -61,7 +61,7 @@ const SubmitIdea = () => {
     validationMethods: []
   });
 
-  // Check if form has been interacted with
+  // Check if user has interacted with any form field
   const checkFormInteraction = () => {
     const hasData = formData.title.trim() || 
                    formData.teaser.trim() || 
@@ -69,23 +69,33 @@ const SubmitIdea = () => {
                    formData.category ||
                    formData.problemDescription.trim() ||
                    formData.validationSource.trim() ||
-                   formData.tags.length > 0;
+                   formData.marketSize ||
+                   formData.tags.length > 0 ||
+                   formData.validationMethods.length > 0 ||
+                   formData.attachments.length > 0 ||
+                   formData.equityPercentage !== 5;
+    
+    console.log('Form interaction check:', hasData, 'Current hasInteractedWithForm:', hasInteractedWithForm);
     
     if (hasData && !hasInteractedWithForm) {
+      console.log('Setting hasInteractedWithForm to true');
       setHasInteractedWithForm(true);
     }
   };
 
-  // Set up exit intent detection
-  useExitIntent({
-    onExitIntent: showExitIntentModalWithPath,
-    isEnabled: hasInteractedWithForm && !user,
-  });
-
   // Check form interaction whenever formData changes
   useEffect(() => {
     checkFormInteraction();
-  }, [formData, hasInteractedWithForm, setHasInteractedWithForm]);
+  }, [formData]);
+
+  // Set up exit intent detection - only when user has interacted with form
+  useExitIntent({
+    onExitIntent: (path) => {
+      console.log('Exit intent callback called with path:', path);
+      showExitIntentModalWithPath(path);
+    },
+    isEnabled: hasInteractedWithForm && !submitting,
+  });
 
   const categories = ['HealthTech', 'EdTech', 'FinTech', 'Sustainability', 'AgriTech', 'Enterprise', 'Consumer', 'AI', 'Other'];
 
@@ -229,7 +239,7 @@ const SubmitIdea = () => {
         description: "Your idea is now under review and will be published automatically once approved.",
       });
 
-      // Reset form
+      // Reset form and interaction state
       setFormData({
         title: '',
         teaser: '',
