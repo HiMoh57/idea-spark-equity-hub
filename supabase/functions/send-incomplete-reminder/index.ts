@@ -65,7 +65,7 @@ const handler = async (req: Request): Promise<Response> => {
         console.log(`Processing submission for email: ${submission.email}`);
         
         const emailResponse = await resend.emails.send({
-          from: "IdeaVault <noreply@ideopark.vercel.app>",
+          from: "IdeaVault <noreply@liqgacnotmqhokowcdvc.supabase.co>",
           to: [submission.email],
           subject: "You were halfway to sharing your genius with the world 💡",
           html: `
@@ -92,7 +92,7 @@ const handler = async (req: Request): Promise<Response> => {
               </p>
               
               <div style="text-align: center; margin: 30px 0;">
-                <a href="https://ideopark.vercel.app/submit-idea" 
+                <a href="https://liqgacnotmqhokowcdvc.supabase.co/submit-idea" 
                    style="background: linear-gradient(to right, #2563eb, #7c3aed); color: white; padding: 12px 30px; text-decoration: none; border-radius: 6px; font-weight: bold; display: inline-block;">
                   Complete Your Submission
                 </a>
