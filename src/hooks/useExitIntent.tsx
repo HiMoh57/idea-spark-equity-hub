@@ -1,5 +1,6 @@
 
 import { useEffect } from 'react';
+import { useNavigate, useBlocker } from 'react-router-dom';
 
 interface UseExitIntentProps {
   onExitIntent: () => void;
@@ -7,6 +8,14 @@ interface UseExitIntentProps {
 }
 
 export const useExitIntent = ({ onExitIntent, isEnabled }: UseExitIntentProps) => {
+  const navigate = useNavigate();
+  
+  // Block navigation when enabled
+  const blocker = useBlocker(
+    ({ currentLocation, nextLocation }) =>
+      isEnabled && currentLocation.pathname !== nextLocation.pathname
+  );
+
   useEffect(() => {
     if (!isEnabled) return;
 
@@ -38,4 +47,11 @@ export const useExitIntent = ({ onExitIntent, isEnabled }: UseExitIntentProps) =
       window.removeEventListener('beforeunload', handleBeforeUnload);
     };
   }, [onExitIntent, isEnabled]);
+
+  // Handle blocked navigation
+  useEffect(() => {
+    if (blocker.state === 'blocked') {
+      onExitIntent();
+    }
+  }, [blocker.state, onExitIntent]);
 };

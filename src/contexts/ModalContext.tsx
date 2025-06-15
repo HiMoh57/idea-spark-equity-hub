@@ -35,6 +35,8 @@ export const ModalProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
   const dismissExitIntentModal = () => {
     setShowExitIntentModal(false);
+    // Reset form interaction state when modal is dismissed
+    setHasInteractedWithForm(false);
   };
 
   return (
