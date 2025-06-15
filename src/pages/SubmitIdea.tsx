@@ -17,7 +17,7 @@ import { ArrowRight } from 'lucide-react';
 const SubmitIdea = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
-  const { showExitIntentModal } = useModal();
+  const { showExitIntentModalWithPath } = useModal();
   
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
@@ -59,12 +59,12 @@ const SubmitIdea = () => {
   }, [user, hasInteracted]);
 
   useExitIntent({
-    onExitIntent: () => {
-      if (!user) {
-        showExitIntentModal();
+    onExitIntent: (path) => {
+      if (!user && hasInteracted) {
+        showExitIntentModalWithPath(path);
       }
     },
-    isEnabled: !user,
+    isEnabled: !user && hasInteracted,
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
