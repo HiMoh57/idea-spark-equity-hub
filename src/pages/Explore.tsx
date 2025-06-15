@@ -91,6 +91,11 @@ const Explore = () => {
     return matchesSearch && matchesCategory;
   });
 
+  const handleViewDetails = (ideaId: string) => {
+    console.log('View details for idea:', ideaId);
+    // Add navigation logic here if needed
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
       <Navbar />
@@ -158,7 +163,7 @@ const Explore = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredIdeas.map(idea => (
               <div key={idea.id} className="space-y-4">
-                <IdeaCard idea={idea} onAccessGranted={() => fetchIdeas()} />
+                <IdeaCard idea={idea} onViewDetails={handleViewDetails} />
                 <CommentSystem ideaId={idea.id} />
               </div>
             ))}
