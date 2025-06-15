@@ -188,10 +188,21 @@ const SubmitIdea = () => {
         }
         break;
       case 2:
-        if (!formData.problemDescription || !formData.validationSource || !formData.marketSize || formData.validationMethods.length === 0) {
+        // Make sure "marketSize" is not empty or whitespace
+        if (
+          !formData.problemDescription ||
+          !formData.validationSource ||
+          !formData.marketSize ||
+          formData.validationMethods.length === 0
+        ) {
+          let msg = "Please provide all validation details to ensure your idea is well-researched.";
+          // Additional error message if market size is just whitespace
+          if (!formData.marketSize || formData.marketSize.trim() === "") {
+            msg = "Market Size is required and cannot be blank. Please provide a value.";
+          }
           toast({
             title: "Missing Validation Information",
-            description: "Please provide all validation details to ensure your idea is well-researched.",
+            description: msg,
             variant: "destructive",
           });
           return false;
