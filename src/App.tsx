@@ -21,6 +21,7 @@ import AboutUs from "./pages/AboutUs";
 import ViewRequest from "./pages/ViewRequest";
 import EditIdea from "./pages/EditIdea";
 import ViewProposal from "./pages/ViewProposal";
+import PublicProfile from "./pages/PublicProfile";
 import RealtimeNotifications from "./components/RealtimeNotifications";
 import { useAuth } from '@/hooks/useAuth';
 import OnboardingModal from '@/components/OnboardingModal';
