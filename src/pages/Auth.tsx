@@ -7,7 +7,7 @@ import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Lightbulb, Mail, Lock } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
 import SocialAuthButtons from "@/components/SocialAuthButtons";
 
@@ -18,6 +18,7 @@ const Auth = () => {
   const [authLoading, setAuthLoading] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
+  const [searchParams] = useSearchParams();
 
   useEffect(() => {
     // Check if user is already logged in
@@ -28,7 +29,18 @@ const Auth = () => {
       }
     };
     checkUser();
-  }, [navigate]);
+
+    // Pre-fill email from URL params or localStorage
+    const emailParam = searchParams.get('email');
+    const storedEmail = localStorage.getItem('preSignupEmail');
+    
+    if (emailParam) {
+      setEmail(emailParam);
+    } else if (storedEmail) {
+      setEmail(storedEmail);
+      localStorage.removeItem('preSignupEmail'); // Clean up
+    }
+  }, [navigate, searchParams]);
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();

@@ -1,9 +1,11 @@
+
 import React, { useEffect } from 'react';
 import Navbar from '@/components/Navbar';
 import Hero from '@/components/Hero';
 import Features from '@/components/Features';
 import Stats from '@/components/Stats';
 import Footer from '@/components/Footer';
+import EmailSignup from '@/components/EmailSignup';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
 import { ArrowRight, CheckCircle2, Sparkles, TrendingUp, Shield } from 'lucide-react';
@@ -71,6 +73,15 @@ const Index = () => {
         
         {/* Enhanced Hero Section */}
         <Hero />
+
+        {/* Email Signup Section - Only show for non-authenticated users */}
+        {!user && (
+          <section className="py-8 px-4 sm:px-6 lg:px-8 relative">
+            <div className="max-w-2xl mx-auto">
+              <EmailSignup />
+            </div>
+          </section>
+        )}
 
         {/* Trust Indicators Section */}
         <section className="py-16 px-4 sm:px-6 lg:px-8 relative">

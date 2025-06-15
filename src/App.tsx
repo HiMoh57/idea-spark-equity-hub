@@ -27,6 +27,9 @@ import OnboardingModal from '@/components/OnboardingModal';
 import { ModalProvider } from '@/contexts/ModalContext';
 import WelcomeModal from '@/components/WelcomeModal';
 import ExitIntentModal from '@/components/ExitIntentModal';
+import DelayedSignupBanner from '@/components/DelayedSignupBanner';
+import MobileCTAPopup from '@/components/MobileCTAPopup';
+import DesktopExitIntentModal from '@/components/DesktopExitIntentModal';
 
 const queryClient = new QueryClient();
 
@@ -41,6 +44,9 @@ const App = () => {
           <Sonner />
           <BrowserRouter>
             <RealtimeNotifications />
+            <DelayedSignupBanner />
+            <MobileCTAPopup />
+            <DesktopExitIntentModal />
             <Routes>
               <Route path="/" element={<Index />} />
               <Route path="/auth" element={<Auth />} />
