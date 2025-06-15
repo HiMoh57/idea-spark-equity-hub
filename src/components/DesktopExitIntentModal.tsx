@@ -15,8 +15,8 @@ const DesktopExitIntentModal = () => {
   const isMobile = useIsMobile();
 
   useEffect(() => {
-    // Only work on desktop for non-authenticated users
-    if (isMobile || user || hasTriggered) return;
+    // Only work for non-authenticated users
+    if (user || hasTriggered) return;
 
     // Check if already triggered in this session
     if (sessionStorage.getItem('exitIntentTriggered')) {
@@ -25,18 +25,53 @@ const DesktopExitIntentModal = () => {
     }
 
     const handleMouseLeave = (e: MouseEvent) => {
-      // Trigger when mouse leaves the top of the viewport
-      if (e.clientY <= 0 && !hasTriggered) {
+      // Trigger when mouse leaves the top of the viewport (desktop only)
+      if (!isMobile && e.clientY <= 0 && !hasTriggered) {
         setIsOpen(true);
         setHasTriggered(true);
         sessionStorage.setItem('exitIntentTriggered', 'true');
       }
     };
 
-    document.addEventListener('mouseleave', handleMouseLeave);
+    const handleTouchStart = () => {
+      // For mobile, trigger on scroll to top
+      if (isMobile && window.scrollY === 0 && !hasTriggered) {
+        setTimeout(() => {
+          if (window.scrollY === 0 && !hasTriggered) {
+            setIsOpen(true);
+            setHasTriggered(true);
+            sessionStorage.setItem('exitIntentTriggered', 'true');
+          }
+        }, 1000); // Delay to avoid accidental triggers
+      }
+    };
+
+    const handleVisibilityChange = () => {
+      // Trigger when page becomes hidden (works on both desktop and mobile)
+      if (document.visibilityState === 'hidden' && !hasTriggered) {
+        setIsOpen(true);
+        setHasTriggered(true);
+        sessionStorage.setItem('exitIntentTriggered', 'true');
+      }
+    };
+
+    // Add appropriate event listeners based on device type
+    if (isMobile) {
+      document.addEventListener('touchstart', handleTouchStart);
+      document.addEventListener('visibilitychange', handleVisibilityChange);
+    } else {
+      document.addEventListener('mouseleave', handleMouseLeave);
+      document.addEventListener('visibilitychange', handleVisibilityChange);
+    }
 
     return () => {
-      document.removeEventListener('mouseleave', handleMouseLeave);
+      if (isMobile) {
+        document.removeEventListener('touchstart', handleTouchStart);
+        document.removeEventListener('visibilitychange', handleVisibilityChange);
+      } else {
+        document.removeEventListener('mouseleave', handleMouseLeave);
+        document.removeEventListener('visibilitychange', handleVisibilityChange);
+      }
     };
   }, [isMobile, user, hasTriggered]);
 
@@ -49,7 +84,7 @@ const DesktopExitIntentModal = () => {
     setIsOpen(false);
   };
 
-  if (isMobile || user) return null;
+  if (user) return null;
 
   return (
     <AlertDialog open={isOpen} onOpenChange={setIsOpen}>
