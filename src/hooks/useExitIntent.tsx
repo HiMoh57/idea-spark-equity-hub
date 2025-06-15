@@ -1,6 +1,6 @@
 
 import { useEffect } from 'react';
-import { useNavigate, useBlocker } from 'react-router-dom';
+import { useBlocker } from 'react-router-dom';
 
 interface UseExitIntentProps {
   onExitIntent: () => void;
@@ -8,8 +8,6 @@ interface UseExitIntentProps {
 }
 
 export const useExitIntent = ({ onExitIntent, isEnabled }: UseExitIntentProps) => {
-  const navigate = useNavigate();
-  
   // Block navigation when enabled
   const blocker = useBlocker(
     ({ currentLocation, nextLocation }) =>

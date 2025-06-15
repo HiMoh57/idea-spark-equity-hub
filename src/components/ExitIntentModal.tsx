@@ -17,8 +17,8 @@ const ExitIntentModal = () => {
 
   const handleLeaveAnyway = () => {
     dismissExitIntentModal();
-    // Allow the navigation to proceed
-    window.history.back();
+    // Navigate to home page when leaving anyway
+    navigate('/');
   };
 
   return (
