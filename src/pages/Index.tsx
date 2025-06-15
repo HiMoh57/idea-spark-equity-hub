@@ -1,5 +1,4 @@
-
-import React from 'react';
+import React, { useEffect } from 'react';
 import Navbar from '@/components/Navbar';
 import Hero from '@/components/Hero';
 import Features from '@/components/Features';
@@ -8,8 +7,25 @@ import Footer from '@/components/Footer';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
 import { ArrowRight, CheckCircle2, Sparkles, TrendingUp, Shield } from 'lucide-react';
+import { useAuth } from '@/hooks/useAuth';
+import { useModal } from '@/contexts/ModalContext';
 
 const Index = () => {
+  const { user } = useAuth();
+  const { setShowWelcomeModal } = useModal();
+
+  useEffect(() => {
+    // Show welcome modal for non-logged-in users who haven't seen it in this session
+    if (!user && !sessionStorage.getItem('welcomeModalShown')) {
+      // Delay slightly to ensure page has loaded
+      const timer = setTimeout(() => {
+        setShowWelcomeModal(true);
+      }, 1500);
+      
+      return () => clearTimeout(timer);
+    }
+  }, [user, setShowWelcomeModal]);
+
   const benefits = [
     "Secure idea sharing with bank-level encryption",
     "Pre-screened entrepreneurs ready to execute",

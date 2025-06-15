@@ -16,6 +16,8 @@ import { useToast } from '@/hooks/use-toast';
 import Footer from '@/components/Footer';
 import { Slider } from '@/components/ui/slider';
 import { Checkbox } from '@/components/ui/checkbox';
+import { useModal } from '@/contexts/ModalContext';
+import { useExitIntent } from '@/hooks/useExitIntent';
 
 interface FormData {
   title: string;
@@ -38,6 +40,7 @@ const SubmitIdea = () => {
   const { user, loading: authLoading } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { setHasInteractedWithForm, setShowExitIntentModal, hasInteractedWithForm } = useModal();
   const [step, setStep] = useState(1);
   const [submitting, setSubmitting] = useState(false);
   const [uploading, setUploading] = useState(false);
@@ -58,6 +61,36 @@ const SubmitIdea = () => {
     marketSize: '',
     validationMethods: []
   });
+
+  // Check if form has been interacted with
+  const checkFormInteraction = () => {
+    const hasData = formData.title.trim() || 
+                   formData.teaser.trim() || 
+                   formData.description.trim() || 
+                   formData.category ||
+                   formData.problemDescription.trim() ||
+                   formData.validationSource.trim() ||
+                   formData.tags.length > 0;
+    
+    if (hasData && !hasInteractedWithForm) {
+      setHasInteractedWithForm(true);
+    }
+  };
+
+  // Set up exit intent detection
+  useExitIntent({
+    onExitIntent: () => {
+      if (hasInteractedWithForm && !user) {
+        setShowExitIntentModal(true);
+      }
+    },
+    isEnabled: hasInteractedWithForm && !user
+  });
+
+  // Check form interaction whenever formData changes
+  useEffect(() => {
+    checkFormInteraction();
+  }, [formData, hasInteractedWithForm, setHasInteractedWithForm]);
 
   const categories = ['HealthTech', 'EdTech', 'FinTech', 'Sustainability', 'AgriTech', 'Enterprise', 'Consumer', 'AI', 'Other'];
 
@@ -219,6 +252,7 @@ const SubmitIdea = () => {
         validationMethods: []
       });
       setStep(1);
+      setHasInteractedWithForm(false);
     } catch (error: any) {
       toast({
         title: "Error submitting idea",
