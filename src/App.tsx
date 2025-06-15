@@ -58,7 +58,7 @@ const App = () => {
               <Route path="/edit-idea/:id" element={<EditIdea />} />
               <Route path="/view-request/:id" element={<ViewRequest />} />
               <Route path="/view-proposal/:id" element={<ViewProposal />} />
-              <Route path="/profile/:id" element={<Dashboard />} />
+              <Route path="/profile/:id" element={<PublicProfile />} />
               <Route path="/terms" element={<Terms />} />
               <Route path="/privacy" element={<Privacy />} />
               <Route path="/disclaimer" element={<Disclaimer />} />
