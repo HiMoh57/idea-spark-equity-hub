@@ -1,8 +1,9 @@
+
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Search, Filter } from 'lucide-react';
+import { Search, Filter, Sparkles, TrendingUp, Clock, Eye } from 'lucide-react';
 import Navbar from '@/components/Navbar';
 import IdeaCard from '@/components/IdeaCard';
 import CommentSystem from '@/components/CommentSystem';
@@ -24,7 +25,7 @@ interface Idea {
   profiles?: {
     full_name?: string;
     is_verified_poster?: boolean;
-  };
+  } | null;
 }
 
 const Explore = () => {
@@ -119,15 +120,30 @@ const Explore = () => {
     // Add navigation logic here if needed
   };
 
+  const getSortIcon = () => {
+    switch (sortBy) {
+      case 'popular': return <Eye className="h-4 w-4" />;
+      case 'interests': return <TrendingUp className="h-4 w-4" />;
+      default: return <Clock className="h-4 w-4" />;
+    }
+  };
+
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 relative overflow-hidden">
+        {/* Animated Background Elements */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <div className="absolute -top-40 -right-40 w-80 h-80 bg-gradient-to-br from-blue-400/20 to-purple-400/20 rounded-full blur-3xl animate-blob"></div>
+          <div className="absolute top-40 -left-40 w-80 h-80 bg-gradient-to-br from-purple-400/20 to-pink-400/20 rounded-full blur-3xl animate-blob animation-delay-2000"></div>
+          <div className="absolute -bottom-40 left-1/2 w-80 h-80 bg-gradient-to-br from-blue-400/20 to-cyan-400/20 rounded-full blur-3xl animate-blob animation-delay-4000"></div>
+        </div>
+        
         <Navbar />
-        <div className="pt-20 pb-12 px-4 sm:px-6 lg:px-8">
+        <div className="relative pt-20 pb-12 px-4 sm:px-6 lg:px-8">
           <div className="max-w-7xl mx-auto">
-            <div className="text-center py-12">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
-              <p className="text-slate-600">Loading ideas...</p>
+            <div className="text-center py-20">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-6"></div>
+              <p className="text-xl text-slate-600">Discovering breakthrough ideas...</p>
             </div>
           </div>
         </div>
@@ -136,157 +152,178 @@ const Explore = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 relative overflow-hidden">
+      {/* Animated Background Elements */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute -top-40 -right-40 w-80 h-80 bg-gradient-to-br from-blue-400/20 to-purple-400/20 rounded-full blur-3xl animate-blob"></div>
+        <div className="absolute top-40 -left-40 w-80 h-80 bg-gradient-to-br from-purple-400/20 to-pink-400/20 rounded-full blur-3xl animate-blob animation-delay-2000"></div>
+        <div className="absolute -bottom-40 left-1/2 w-80 h-80 bg-gradient-to-br from-blue-400/20 to-cyan-400/20 rounded-full blur-3xl animate-blob animation-delay-4000"></div>
+      </div>
+
       <Navbar />
       
-      <div className="pt-20 pb-12 px-4 sm:px-6 lg:px-8">
+      <div className="relative pt-20 pb-12 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
           {/* Hero Section */}
-          <div className="text-center mb-12">
-            <h1 className="text-5xl font-bold text-slate-900 mb-6 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-              Explore Startup Ideas
+          <div className="text-center mb-16 relative">
+            <div className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-100 to-purple-100 text-blue-800 rounded-full text-sm font-medium mb-6 animate-fade-in border border-blue-200/50 backdrop-blur-sm">
+              <Sparkles className="h-4 w-4" />
+              Discover the Next Unicorn
+            </div>
+            
+            <h1 className="text-5xl md:text-6xl font-black text-slate-900 mb-6 leading-tight animate-fade-in animation-delay-200">
+              Explore
+              <span className="bg-gradient-to-r from-blue-600 via-purple-600 to-blue-800 bg-clip-text text-transparent"> Revolutionary</span>
+              <br />Startup Ideas
             </h1>
-            <p className="text-xl text-slate-600 max-w-3xl mx-auto leading-relaxed">
-              Discover innovative concepts from visionary creators. Connect with groundbreaking ideas 
-              and find your next big opportunity in the startup ecosystem.
+            
+            <p className="text-xl md:text-2xl text-slate-600 max-w-3xl mx-auto leading-relaxed animate-fade-in animation-delay-400">
+              Discover innovative concepts from visionary creators. Find breakthrough opportunities 
+              that could reshape entire industries.
             </p>
-            <div className="mt-8 flex justify-center gap-4 text-sm text-slate-500">
-              <div className="flex items-center gap-2">
-                <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                <span>{ideas.length} Active Ideas</span>
+
+            {/* Stats */}
+            <div className="flex justify-center items-center gap-8 mt-8 animate-fade-in animation-delay-600">
+              <div className="text-center">
+                <div className="text-2xl font-bold text-slate-900">{ideas.length}+</div>
+                <div className="text-sm text-slate-600">Active Ideas</div>
               </div>
-              <div className="flex items-center gap-2">
-                <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                <span>Real-time Updates</span>
+              <div className="w-px h-8 bg-slate-300"></div>
+              <div className="text-center">
+                <div className="text-2xl font-bold text-slate-900">
+                  {ideas.reduce((sum, idea) => sum + idea.interests, 0)}+
+                </div>
+                <div className="text-sm text-slate-600">Total Interest</div>
               </div>
-              <div className="flex items-center gap-2">
-                <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
-                <span>Verified Creators</span>
+              <div className="w-px h-8 bg-slate-300"></div>
+              <div className="text-center">
+                <div className="text-2xl font-bold text-slate-900">
+                  {ideas.reduce((sum, idea) => sum + idea.views, 0)}+
+                </div>
+                <div className="text-sm text-slate-600">Views</div>
               </div>
             </div>
           </div>
 
           {/* Enhanced Search and Filters */}
-          <Card className="mb-8 border-0 shadow-xl bg-white/90 backdrop-blur-md">
+          <Card className="mb-12 border-0 shadow-2xl bg-white/90 backdrop-blur-xl animate-fade-in animation-delay-800 hover:shadow-3xl transition-all duration-500">
             <CardContent className="p-8">
               <div className="flex flex-col lg:flex-row gap-6">
-                <div className="flex-1 relative">
-                  <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-slate-400" />
+                <div className="flex-1 relative group">
+                  <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-slate-400 group-focus-within:text-blue-500 transition-colors" />
                   <Input
-                    placeholder="Search by title, description, tags, or creator..."
+                    placeholder="Search breakthrough ideas, cutting-edge tech, industry disruptors..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className="pl-12 py-3 text-base border-slate-200 focus:border-blue-500 focus:ring-blue-500"
+                    className="pl-12 h-14 text-lg border-2 border-slate-200 focus:border-blue-500 focus:ring-blue-500/20 rounded-xl bg-white/80 backdrop-blur-sm transition-all duration-300"
                   />
                 </div>
                 
                 <div className="flex flex-col sm:flex-row gap-4">
                   <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-                    <SelectTrigger className="w-full sm:w-56 py-3">
-                      <Filter className="h-4 w-4 mr-2" />
-                      <SelectValue placeholder="Category" />
+                    <SelectTrigger className="w-full sm:w-56 h-14 border-2 border-slate-200 focus:border-purple-500 rounded-xl bg-white/80 backdrop-blur-sm transition-all duration-300">
+                      <div className="flex items-center gap-2">
+                        <Filter className="h-5 w-5 text-slate-600" />
+                        <SelectValue placeholder="Industry" />
+                      </div>
                     </SelectTrigger>
-                    <SelectContent>
+                    <SelectContent className="bg-white/95 backdrop-blur-xl border-slate-200 shadow-2xl">
                       {categories.map(category => (
-                        <SelectItem key={category} value={category}>
-                          {category === 'all' ? 'All Categories' : category}
+                        <SelectItem key={category} value={category} className="hover:bg-blue-50">
+                          {category === 'all' ? 'All Industries' : category}
                         </SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
 
                   <Select value={sortBy} onValueChange={setSortBy}>
-                    <SelectTrigger className="w-full sm:w-48 py-3">
-                      <SelectValue placeholder="Sort by" />
+                    <SelectTrigger className="w-full sm:w-56 h-14 border-2 border-slate-200 focus:border-purple-500 rounded-xl bg-white/80 backdrop-blur-sm transition-all duration-300">
+                      <div className="flex items-center gap-2">
+                        {getSortIcon()}
+                        <SelectValue placeholder="Sort by" />
+                      </div>
                     </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="newest">Newest First</SelectItem>
-                      <SelectItem value="popular">Most Popular</SelectItem>
-                      <SelectItem value="interests">Most Interest</SelectItem>
+                    <SelectContent className="bg-white/95 backdrop-blur-xl border-slate-200 shadow-2xl">
+                      <SelectItem value="newest" className="hover:bg-blue-50">
+                        <div className="flex items-center gap-2">
+                          <Clock className="h-4 w-4" />
+                          Latest Ideas
+                        </div>
+                      </SelectItem>
+                      <SelectItem value="popular" className="hover:bg-blue-50">
+                        <div className="flex items-center gap-2">
+                          <Eye className="h-4 w-4" />
+                          Most Viewed
+                        </div>
+                      </SelectItem>
+                      <SelectItem value="interests" className="hover:bg-blue-50">
+                        <div className="flex items-center gap-2">
+                          <TrendingUp className="h-4 w-4" />
+                          Trending
+                        </div>
+                      </SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
               </div>
-
-              {/* Filter Tags */}
-              {searchQuery && (
-                <div className="mt-4 pt-4 border-t border-slate-200">
-                  <div className="flex items-center gap-2">
-                    <span className="text-sm text-slate-600">Searching for:</span>
-                    <span className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-medium">
-                      "{searchQuery}"
-                    </span>
-                    <button
-                      onClick={() => setSearchQuery('')}
-                      className="text-slate-400 hover:text-slate-600 text-sm"
-                    >
-                      Clear
-                    </button>
-                  </div>
-                </div>
-              )}
             </CardContent>
           </Card>
 
           {/* Results Header */}
-          <div className="mb-8 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+          <div className="mb-8 flex justify-between items-center animate-fade-in animation-delay-1000">
             <div>
-              <p className="text-lg font-medium text-slate-900">
-                {filteredIdeas.length} idea{filteredIdeas.length !== 1 ? 's' : ''} found
-              </p>
-              <p className="text-sm text-slate-600 mt-1">
-                {selectedCategory !== 'all' && `in ${selectedCategory} • `}
-                Sorted by {sortBy === 'newest' ? 'newest first' : sortBy === 'popular' ? 'popularity' : 'interest level'}
-              </p>
+              <h2 className="text-2xl font-bold text-slate-900 mb-2">
+                {filteredIdeas.length === 0 ? 'No results found' : 
+                 `${filteredIdeas.length} breakthrough idea${filteredIdeas.length !== 1 ? 's' : ''} discovered`}
+              </h2>
+              {searchQuery && (
+                <p className="text-slate-600">
+                  Searching for "{searchQuery}" in {selectedCategory === 'all' ? 'all industries' : selectedCategory}
+                </p>
+              )}
             </div>
-            
-            {filteredIdeas.length > 0 && (
-              <div className="text-sm text-slate-500">
-                Last updated: {new Date().toLocaleTimeString()}
-              </div>
-            )}
           </div>
 
           {/* Ideas Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {filteredIdeas.map((idea, index) => (
               <div 
                 key={idea.id} 
-                className="space-y-4 animate-fade-in"
-                style={{ animationDelay: `${index * 100}ms` }}
+                className="space-y-6 animate-fade-in group"
+                style={{ animationDelay: `${1200 + index * 100}ms` }}
               >
-                <IdeaCard idea={idea} onViewDetails={handleViewDetails} />
-                <CommentSystem ideaId={idea.id} />
+                <div className="transform transition-all duration-500 hover:scale-105">
+                  <IdeaCard idea={idea} onViewDetails={handleViewDetails} />
+                </div>
+                <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                  <CommentSystem ideaId={idea.id} />
+                </div>
               </div>
             ))}
           </div>
 
-          {/* Empty State */}
           {filteredIdeas.length === 0 && (
-            <div className="text-center py-16">
-              <div className="bg-gradient-to-br from-slate-100 to-slate-200 rounded-full p-6 w-fit mx-auto mb-6">
-                <Search className="h-12 w-12 text-slate-400" />
+            <div className="text-center py-20 animate-fade-in">
+              <div className="bg-gradient-to-br from-slate-100 to-blue-100 rounded-full p-8 w-fit mx-auto mb-8 shadow-xl">
+                <Search className="h-12 w-12 text-slate-500" />
               </div>
-              <h3 className="text-2xl font-bold text-slate-900 mb-3">No ideas found</h3>
-              <p className="text-slate-600 mb-6 max-w-md mx-auto">
-                We couldn't find any ideas matching your criteria. Try adjusting your search terms or exploring different categories.
+              <h3 className="text-3xl font-bold text-slate-900 mb-4">No breakthrough ideas found</h3>
+              <p className="text-xl text-slate-600 mb-8 max-w-md mx-auto">
+                Try adjusting your search criteria or explore different industries to discover innovative concepts.
               </p>
-              <div className="flex flex-col sm:flex-row gap-3 justify-center">
-                <button
-                  onClick={() => {
-                    setSearchQuery('');
-                    setSelectedCategory('all');
-                  }}
-                  className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-                >
-                  Clear All Filters
-                </button>
-                <button
-                  onClick={() => window.location.reload()}
-                  className="px-6 py-2 border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50 transition-colors"
-                >
-                  Refresh Ideas
-                </button>
+              <div className="flex flex-wrap justify-center gap-3">
+                {categories.slice(1, 6).map(category => (
+                  <button
+                    key={category}
+                    onClick={() => {
+                      setSelectedCategory(category);
+                      setSearchQuery('');
+                    }}
+                    className="px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-full font-medium hover:from-blue-700 hover:to-purple-700 transform hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-xl"
+                  >
+                    Explore {category}
+                  </button>
+                ))}
               </div>
             </div>
           )}
