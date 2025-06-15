@@ -1,73 +1,112 @@
 
-import React from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import React, { useEffect, useState } from 'react';
+import { AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogFooter } from '@/components/ui/alert-dialog';
 import { Button } from '@/components/ui/button';
-import { useModal } from '@/contexts/ModalContext';
+import { Sparkles, ArrowRight } from 'lucide-react';
+import { useAuth } from '@/hooks/useAuth';
 import { useNavigate } from 'react-router-dom';
-import { X, CheckCircle, Sparkles, TrendingUp } from 'lucide-react';
 
 const WelcomeModal = () => {
-  const { showWelcomeModal, dismissWelcomeModal } = useModal();
+  const [isOpen, setIsOpen] = useState(false);
+  const [hasShownWelcome, setHasShownWelcome] = useState(false);
+  const { user } = useAuth();
   const navigate = useNavigate();
 
-  const handleJoinNow = () => {
-    navigate('/auth');
-    dismissWelcomeModal();
+  useEffect(() => {
+    if (user && !hasShownWelcome) {
+      // Check if this is a new user (created within last 5 minutes)
+      const userCreatedAt = new Date(user.created_at);
+      const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000);
+      
+      const isNewUser = userCreatedAt > fiveMinutesAgo;
+      const hasSeenWelcome = localStorage.getItem(`welcome_shown_${user.id}`);
+      
+      if (isNewUser && !hasSeenWelcome) {
+        setTimeout(() => {
+          setIsOpen(true);
+          setHasShownWelcome(true);
+          localStorage.setItem(`welcome_shown_${user.id}`, 'true');
+        }, 1000);
+      }
+    }
+  }, [user, hasShownWelcome]);
+
+  const handleClose = () => {
+    setIsOpen(false);
+  };
+
+  const handleSubmitIdea = () => {
+    setIsOpen(false);
+    navigate('/submit-idea');
+  };
+
+  const getUserFirstName = () => {
+    if (user?.user_metadata?.full_name) {
+      return user.user_metadata.full_name.split(' ')[0];
+    }
+    return user?.email?.split('@')[0] || 'there';
   };
 
   return (
-    <Dialog open={showWelcomeModal} onOpenChange={dismissWelcomeModal}>
-      <DialogContent className="sm:max-w-md border-0 shadow-2xl bg-white/95 backdrop-blur-xl">
-        <button
-          onClick={dismissWelcomeModal}
-          className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 z-10"
-        >
-          <X className="h-4 w-4" />
-          <span className="sr-only">Close</span>
-        </button>
-        
-        <DialogHeader className="text-center space-y-4 pt-6">
-          <div className="mx-auto w-16 h-16 bg-gradient-to-r from-blue-600 to-purple-600 rounded-full flex items-center justify-center mb-4">
+    <AlertDialog open={isOpen} onOpenChange={setIsOpen}>
+      <AlertDialogContent className="sm:max-w-md border-0 shadow-2xl bg-white/95 backdrop-blur-xl">
+        <AlertDialogHeader className="text-center space-y-4">
+          <div className="mx-auto w-16 h-16 bg-gradient-to-r from-purple-400 to-pink-500 rounded-full flex items-center justify-center mb-4">
             <Sparkles className="h-8 w-8 text-white" />
           </div>
-          <DialogTitle className="text-2xl font-bold text-slate-900">
-            Hey! You haven't joined IdeoPark yet?
-          </DialogTitle>
-        </DialogHeader>
+          <AlertDialogTitle className="text-2xl font-bold text-slate-900">
+            Hey {getUserFirstName()}, welcome to IdeoPark! 🎉
+          </AlertDialogTitle>
+        </AlertDialogHeader>
         
-        <div className="text-center space-y-6 py-6">
-          <p className="text-slate-600 text-lg">You're missing out on:</p>
+        <div className="text-center space-y-4 py-4">
+          <p className="text-slate-600 text-lg leading-relaxed">
+            Ready to turn your ideas into reality?
+          </p>
           
-          <div className="space-y-4">
-            <div className="flex items-center space-x-3 p-3 bg-green-50 rounded-xl border border-green-200">
-              <CheckCircle className="h-6 w-6 text-green-600 flex-shrink-0" />
-              <span className="text-green-800 font-medium">Real equity for your ideas</span>
+          <div className="p-4 bg-gradient-to-r from-green-50 to-blue-50 rounded-xl border border-green-200">
+            <div className="flex items-center justify-center space-x-2 mb-2">
+              <span className="text-2xl">🚀</span>
+              <span className="font-semibold text-slate-800">Submit your first idea</span>
             </div>
-            
-            <div className="flex items-center space-x-3 p-3 bg-blue-50 rounded-xl border border-blue-200">
-              <CheckCircle className="h-6 w-6 text-blue-600 flex-shrink-0" />
-              <span className="text-blue-800 font-medium">A place to be discovered</span>
-            </div>
-            
-            <div className="flex items-center space-x-3 p-3 bg-purple-50 rounded-xl border border-purple-200">
-              <CheckCircle className="h-6 w-6 text-purple-600 flex-shrink-0" />
-              <span className="text-purple-800 font-medium">The future of startup creation</span>
-            </div>
+            <p className="text-slate-700 text-sm">and start earning equity from day one!</p>
           </div>
           
-          <div className="pt-4">
-            <p className="text-slate-700 font-medium mb-4">👉 Click below to join the movement.</p>
-            <Button
-              onClick={handleJoinNow}
-              className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-bold py-3 px-6 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
-            >
-              <TrendingUp className="h-5 w-5 mr-2" />
-              Join Now
-            </Button>
+          <div className="grid grid-cols-3 gap-4 text-center text-sm">
+            <div>
+              <div className="text-2xl mb-1">💡</div>
+              <div className="text-slate-600">Share Ideas</div>
+            </div>
+            <div>
+              <div className="text-2xl mb-1">🤝</div>
+              <div className="text-slate-600">Find Partners</div>
+            </div>
+            <div>
+              <div className="text-2xl mb-1">📈</div>
+              <div className="text-slate-600">Earn Equity</div>
+            </div>
           </div>
         </div>
-      </DialogContent>
-    </Dialog>
+        
+        <AlertDialogFooter className="flex flex-col space-y-3">
+          <Button
+            onClick={handleSubmitIdea}
+            className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-bold py-3 px-6 rounded-xl"
+          >
+            <Sparkles className="h-5 w-5 mr-2" />
+            Submit My First Idea
+            <ArrowRight className="h-5 w-5 ml-2" />
+          </Button>
+          <Button
+            onClick={handleClose}
+            variant="ghost"
+            className="w-full text-slate-600 hover:text-slate-800"
+          >
+            I'll explore first
+          </Button>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
   );
 };
 

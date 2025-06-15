@@ -71,6 +71,65 @@ export type Database = {
         }
         Relationships: []
       }
+      app_stats: {
+        Row: {
+          active_countries: number | null
+          id: string
+          ideas_submitted_today: number | null
+          last_updated: string
+          total_users: number | null
+        }
+        Insert: {
+          active_countries?: number | null
+          id?: string
+          ideas_submitted_today?: number | null
+          last_updated?: string
+          total_users?: number | null
+        }
+        Update: {
+          active_countries?: number | null
+          id?: string
+          ideas_submitted_today?: number | null
+          last_updated?: string
+          total_users?: number | null
+        }
+        Relationships: []
+      }
+      featured_ideas: {
+        Row: {
+          created_at: string
+          featured_order: number
+          id: string
+          idea_id: string | null
+          is_active: boolean | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          featured_order?: number
+          id?: string
+          idea_id?: string | null
+          is_active?: boolean | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          featured_order?: number
+          id?: string
+          idea_id?: string | null
+          is_active?: boolean | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "featured_ideas_idea_id_fkey"
+            columns: ["idea_id"]
+            isOneToOne: false
+            referencedRelation: "ideas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       idea_comments: {
         Row: {
           comment: string
@@ -355,12 +414,15 @@ export type Database = {
         Row: {
           bio: string | null
           created_at: string | null
+          email_verified: boolean | null
           experience: string | null
           full_name: string | null
           id: string
           interested_tags: string[] | null
+          is_verified_poster: boolean | null
           newsletter_email: string | null
           profile_complete: boolean | null
+          profile_picture_url: string | null
           updated_at: string | null
           user_goal: string | null
           user_type: string | null
@@ -368,12 +430,15 @@ export type Database = {
         Insert: {
           bio?: string | null
           created_at?: string | null
+          email_verified?: boolean | null
           experience?: string | null
           full_name?: string | null
           id: string
           interested_tags?: string[] | null
+          is_verified_poster?: boolean | null
           newsletter_email?: string | null
           profile_complete?: boolean | null
+          profile_picture_url?: string | null
           updated_at?: string | null
           user_goal?: string | null
           user_type?: string | null
@@ -381,12 +446,15 @@ export type Database = {
         Update: {
           bio?: string | null
           created_at?: string | null
+          email_verified?: boolean | null
           experience?: string | null
           full_name?: string | null
           id?: string
           interested_tags?: string[] | null
+          is_verified_poster?: boolean | null
           newsletter_email?: string | null
           profile_complete?: boolean | null
+          profile_picture_url?: string | null
           updated_at?: string | null
           user_goal?: string | null
           user_type?: string | null
@@ -531,6 +599,10 @@ export type Database = {
       toggle_idea_interest_with_notification: {
         Args: { idea_uuid: string }
         Returns: boolean
+      }
+      update_app_stats: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
       }
     }
     Enums: {
