@@ -99,6 +99,11 @@ const Explore = () => {
     }
   };
 
+  const handleViewDetails = (ideaId: string) => {
+    console.log('View details for idea:', ideaId);
+    // TODO: Navigate to idea details page or open modal
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 relative overflow-hidden">
       {/* Animated Background Elements */}
@@ -258,7 +263,7 @@ const Explore = () => {
                   style={{ animationDelay: `${1200 + index * 100}ms` }}
                 >
                   <div className="transform transition-all duration-500 hover:scale-105">
-                    <IdeaCard idea={idea} onAccessGranted={() => fetchIdeas()} />
+                    <IdeaCard idea={idea} onViewDetails={handleViewDetails} />
                   </div>
                   <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                     <CommentSystem ideaId={idea.id} />
