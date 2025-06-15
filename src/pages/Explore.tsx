@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -114,11 +113,6 @@ const Explore = () => {
     const matchesCategory = selectedCategory === 'all' || idea.category === selectedCategory;
     return matchesSearch && matchesCategory;
   });
-
-  const handleViewDetails = (ideaId: string) => {
-    console.log('View details for idea:', ideaId);
-    // Add navigation logic here if needed
-  };
 
   const getSortIcon = () => {
     switch (sortBy) {
@@ -293,7 +287,7 @@ const Explore = () => {
                 style={{ animationDelay: `${1200 + index * 100}ms` }}
               >
                 <div className="transform transition-all duration-500 hover:scale-105">
-                  <IdeaCard idea={idea} onViewDetails={handleViewDetails} />
+                  <IdeaCard idea={idea} onAccessGranted={() => fetchIdeas()} />
                 </div>
                 <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                   <CommentSystem ideaId={idea.id} />
