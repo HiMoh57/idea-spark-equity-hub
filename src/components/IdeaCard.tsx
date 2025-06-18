@@ -1,12 +1,12 @@
-
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Eye, Heart, Clock, User, Lock, Bookmark, CheckCircle } from 'lucide-react';
+import { Eye, Heart, Clock, User, Lock, Bookmark, CheckCircle, Sparkles } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { Link } from 'react-router-dom';
 import UpiPaymentModal from './UpiPaymentModal';
 
 interface IdeaCardProps {
@@ -311,6 +311,18 @@ const IdeaCard: React.FC<IdeaCardProps> = ({
                 {isSaved ? 'Saved' : 'Save'}
               </Button>
             </div>
+
+            {/* Generate Pitch Button */}
+            <Link to={`/fundeer?ideaId=${idea.id}`}>
+              <Button 
+                variant="outline"
+                size="sm"
+                className="w-full bg-gradient-to-r from-purple-50 to-blue-50 border-purple-200 text-purple-700 hover:from-purple-100 hover:to-blue-100"
+              >
+                <Sparkles className="h-4 w-4 mr-2" />
+                Generate Pitch Deck
+              </Button>
+            </Link>
 
             {!hasAccess && !pendingVerification && !accessGranted && (
               <Button 

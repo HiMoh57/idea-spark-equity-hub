@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -22,6 +21,7 @@ import ViewRequest from "./pages/ViewRequest";
 import EditIdea from "./pages/EditIdea";
 import ViewProposal from "./pages/ViewProposal";
 import PublicProfile from "./pages/PublicProfile";
+import Fundeer from "./pages/Fundeer";
 import RealtimeNotifications from "./components/RealtimeNotifications";
 import { useAuth } from '@/hooks/useAuth';
 import OnboardingModal from '@/components/OnboardingModal';
@@ -60,6 +60,7 @@ const App = () => {
               <Route path="/view-request/:id" element={<ViewRequest />} />
               <Route path="/view-proposal/:id" element={<ViewProposal />} />
               <Route path="/profile/:id" element={<PublicProfile />} />
+              <Route path="/fundeer" element={<Fundeer />} />
               <Route path="/terms" element={<Terms />} />
               <Route path="/privacy" element={<Privacy />} />
               <Route path="/disclaimer" element={<Disclaimer />} />

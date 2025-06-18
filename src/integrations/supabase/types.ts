@@ -614,6 +614,113 @@ export type Database = {
           },
         ]
       }
+      pitch_decks: {
+        Row: {
+          id: string
+          user_id: string
+          idea_id: string | null
+          title: string
+          problem_statement: string
+          solution: string
+          business_model: string
+          target_market: string
+          competitor_summary: string
+          traction: string
+          team: string
+          ask_and_use_of_funds: string
+          deck_content: Json
+          pdf_url: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          idea_id?: string | null
+          title: string
+          problem_statement: string
+          solution: string
+          business_model: string
+          target_market: string
+          competitor_summary: string
+          traction: string
+          team: string
+          ask_and_use_of_funds: string
+          deck_content?: Json
+          pdf_url?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          idea_id?: string | null
+          title?: string
+          problem_statement?: string
+          solution?: string
+          business_model?: string
+          target_market?: string
+          competitor_summary?: string
+          traction?: string
+          team?: string
+          ask_and_use_of_funds?: string
+          deck_content?: Json
+          pdf_url?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pitch_decks_idea_id_fkey"
+            columns: ["idea_id"]
+            isOneToOne: false
+            referencedRelation: "ideas"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pitch_decks_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      pitch_deck_usage: {
+        Row: {
+          id: string
+          user_id: string
+          month_year: string
+          usage_count: number
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          month_year: string
+          usage_count?: number
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          month_year?: string
+          usage_count?: number
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pitch_deck_usage_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
@@ -648,6 +755,21 @@ export type Database = {
       update_app_stats: {
         Args: Record<PropertyKey, never>
         Returns: undefined
+      }
+      get_or_create_monthly_usage: {
+        Args: { user_uuid: string }
+        Returns: {
+          id: string
+          user_id: string
+          month_year: string
+          usage_count: number
+          created_at: string
+          updated_at: string
+        }
+      }
+      increment_pitch_deck_usage: {
+        Args: { user_uuid: string }
+        Returns: boolean
       }
     }
     Enums: {
