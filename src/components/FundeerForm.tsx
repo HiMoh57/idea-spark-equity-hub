@@ -293,10 +293,9 @@ const FundeerForm: React.FC<FundeerFormProps> = ({
               
               <Button
                 type="submit"
-                disabled={!isValid || isSubmitting || !canSubmit}
-                className="flex items-center gap-2"
+                className="w-full"
+                disabled={!canSubmit || isSubmitting || !isValid}
               >
-                <Sparkles className="h-4 w-4" />
                 {isSubmitting ? 'Generating...' : 'Generate Pitch Deck'}
               </Button>
             </div>
