@@ -9,6 +9,7 @@ import PitchDeckViewer from '@/components/PitchDeckViewer';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Sparkles, Download, Copy, ArrowLeft } from 'lucide-react';
+import jsPDF from 'jspdf';
 
 interface Idea {
   id: string;
@@ -124,6 +125,24 @@ const Fundeer = () => {
     setCurrentStep('generating');
 
     try {
+      // --- Backend usage enforcement ---
+      if (profile?.user_type !== 'premium') {
+        const { data: canUse, error: usageError } = await supabase.rpc('increment_pitch_deck_usage', { user_uuid: user.id });
+        if (usageError) throw usageError;
+        if (!canUse) {
+          toast({
+            title: "Usage limit reached (server)",
+            description: "You've reached your monthly limit. Upgrade to premium for unlimited pitch decks.",
+            variant: "destructive"
+          });
+          setCurrentStep('form');
+          setIsGenerating(false);
+          await checkUsageLimit();
+          return;
+        }
+      }
+      // --- End backend usage enforcement ---
+
       const deckContent = await generatePitchDeck(formData);
       
       const { data, error } = await supabase
@@ -223,18 +242,41 @@ const Fundeer = () => {
 
   const handleDownloadPDF = async () => {
     if (!pitchDeck) return;
-    
-    toast({
-      title: "Download started",
-      description: "Your pitch deck PDF is being generated..."
-    });
-    
-    setTimeout(() => {
-      toast({
-        title: "Download complete",
-        description: "Your pitch deck has been downloaded successfully."
+    try {
+      const slides = pitchDeck.deck_content || [];
+      if (!Array.isArray(slides) || slides.length === 0) {
+        toast({
+          title: 'Download failed',
+          description: 'No slides found in this pitch deck.',
+          variant: 'destructive'
+        });
+        return;
+      }
+      const doc = new jsPDF();
+      slides.forEach((slide, idx) => {
+        if (idx !== 0) doc.addPage();
+        doc.setFontSize(22);
+        doc.text(slide.title || '', 20, 30);
+        doc.setFontSize(14);
+        if (slide.subtitle) {
+          doc.text(slide.subtitle, 20, 45);
+        }
+        if (slide.content) {
+          doc.text(doc.splitTextToSize(slide.content, 170), 20, 60);
+        }
       });
-    }, 2000);
+      doc.save(`${pitchDeck.title.replace(/[^a-z0-9]/gi, '_')}_PitchDeck.pdf`);
+      toast({
+        title: 'Download complete',
+        description: 'Your pitch deck has been downloaded successfully.'
+      });
+    } catch (err: any) {
+      toast({
+        title: 'Download failed',
+        description: err?.message || 'An error occurred while generating the PDF.',
+        variant: 'destructive'
+      });
+    }
   };
 
   const handleCopyPitchText = async () => {
