@@ -45,12 +45,35 @@ const IdeaCard: React.FC<IdeaCardProps> = ({
   const [requestId, setRequestId] = useState<string | null>(null);
 
   useEffect(() => {
-    if (user) {
-      checkUserInteractions();
-      fetchCreatorName();
-      checkAccessRequest();
+    if (!user) return;
+    checkUserInteractions();
+    fetchCreatorName();
+    checkAccessRequest();
+
+    let subscription: any;
+    if (requestId) {
+      subscription = supabase
+        .channel('public:access_requests')
+        .on(
+          'postgres_changes',
+          {
+            event: 'UPDATE',
+            schema: 'public',
+            table: 'access_requests',
+            filter: `id=eq.${requestId}`
+          },
+          (payload) => {
+            checkAccessRequest();
+          }
+        )
+        .subscribe();
     }
-  }, [user, idea.id]);
+
+    return () => {
+      if (subscription) supabase.removeChannel(subscription);
+    };
+    // --- End real-time subscription ---
+  }, [user, idea.id, requestId]);
 
   const checkUserInteractions = async () => {
     if (!user) return;
