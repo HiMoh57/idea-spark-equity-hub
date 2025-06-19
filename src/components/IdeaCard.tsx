@@ -227,7 +227,6 @@ const IdeaCard: React.FC<IdeaCardProps> = ({
         .insert({
           idea_id: idea.id,
           requester_id: user.id,
-          creator_id: idea.creator_id,
           status: 'pending',
           created_at: new Date().toISOString()
         })
