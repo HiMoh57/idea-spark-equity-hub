@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
@@ -45,6 +45,7 @@ const Fundeer = () => {
   const [isGenerating, setIsGenerating] = useState(false);
   const [currentStep, setCurrentStep] = useState<'form' | 'generating' | 'viewer'>('form');
   const [usageLimit, setUsageLimit] = useState<{ current: number; limit: number }>({ current: 0, limit: 1 });
+  const navigate = useNavigate();
 
   const ideaId = searchParams.get('ideaId');
 
@@ -158,15 +159,9 @@ const Fundeer = () => {
 
       if (error) throw error;
 
-      setPitchDeck(data);
-      setCurrentStep('viewer');
-      
-      await checkUsageLimit();
-      
-      toast({
-        title: "Pitch deck generated!",
-        description: "Your investor-ready pitch deck is ready to view and download."
-      });
+      // Redirect to new deck preview route
+      navigate(`/fundeer/deck-preview/${data.id}`); // Always redirect to visual deck preview
+      return;
     } catch (error: any) {
       toast({
         title: "Error generating pitch deck",
@@ -200,19 +195,19 @@ const Fundeer = () => {
         background: 'bg-green-50'
       },
       {
-        type: 'business-model',
+        type: 'business_model',
         title: 'Business Model',
         content: formData.business_model,
         background: 'bg-blue-50'
       },
       {
-        type: 'market',
+        type: 'target_market',
         title: 'Target Market',
         content: formData.target_market,
         background: 'bg-yellow-50'
       },
       {
-        type: 'competition',
+        type: 'competitor_summary',
         title: 'Competitive Landscape',
         content: formData.competitor_summary,
         background: 'bg-purple-50'
@@ -230,7 +225,7 @@ const Fundeer = () => {
         background: 'bg-pink-50'
       },
       {
-        type: 'ask',
+        type: 'ask_and_use_of_funds',
         title: 'Investment Ask',
         content: formData.ask_and_use_of_funds,
         background: 'bg-emerald-50'

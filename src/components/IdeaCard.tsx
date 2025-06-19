@@ -46,8 +46,8 @@ const IdeaCard: React.FC<IdeaCardProps> = ({
 
   useEffect(() => {
     if (!user) return;
-    checkUserInteractions();
-    fetchCreatorName();
+      checkUserInteractions();
+      fetchCreatorName();
     checkAccessRequest();
 
     let subscription: any;
@@ -377,7 +377,7 @@ const IdeaCard: React.FC<IdeaCardProps> = ({
 
             {/* Request Access Button */}
             {!hasAccess && (
-              <Button
+              <Button 
                 onClick={handleRequestAccess}
                 className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
                 size="sm"

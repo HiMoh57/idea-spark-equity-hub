@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { ChevronLeft, ChevronRight, Maximize2, Minimize2 } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 interface PitchDeck {
   id: string;
@@ -81,6 +82,13 @@ const PitchDeckViewer: React.FC<PitchDeckViewerProps> = ({ pitchDeck }) => {
 
   return (
     <div className="space-y-6">
+      {pitchDeck?.id && (
+        <div className="flex justify-end">
+          <Link to={`/fundeer/deck-preview/${pitchDeck.id}`} className="inline-block">
+            <Button variant="default" className="mb-4">View Visual Deck Preview</Button>
+          </Link>
+        </div>
+      )}
       {/* Slide Navigation */}
       <div className="flex items-center justify-between bg-white/80 backdrop-blur-sm rounded-lg p-4 border border-slate-200">
         <div className="flex items-center gap-4">

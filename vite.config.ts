@@ -23,3 +23,6 @@ export default defineConfig(({ mode }) => ({
     include: ['framer-motion']
   }
 }));
+
+// jsPDF works out of the box with Vite. No special config needed.
+// If you encounter issues, check optimizeDeps.include/exclude.

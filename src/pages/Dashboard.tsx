@@ -477,7 +477,7 @@ const Dashboard = () => {
                     {accessRequests.map((req: any) => (
                       <Card key={req.id} className="bg-white/80 backdrop-blur-xl border-0 shadow-xl hover:shadow-2xl transition-all duration-300 group overflow-hidden">
                         <CardContent className="p-6 flex flex-col md:flex-row md:items-center md:justify-between gap-6">
-                          <div className="flex-1">
+                            <div className="flex-1">
                             <div className="flex items-center gap-3 mb-2">
                               <h4 className="text-lg font-bold text-slate-900">{req.ideas?.title || 'Idea'}</h4>
                               <Badge variant="outline" className="bg-gradient-to-r from-blue-100 to-purple-100 text-blue-700 border-blue-200">
@@ -523,14 +523,14 @@ const Dashboard = () => {
                             {req.status === 'approved' && (
                               <>
                                 <span className="text-green-700 font-semibold">Approved</span>
-                                <Button
+                            <Button 
                                   size="sm"
-                                  variant="outline"
+                              variant="outline" 
                                   className="ml-2"
                                   onClick={() => navigate(`/chat?ideaId=${req.idea_id}&userId=${req.requester_id}`)}
-                                >
+                            >
                                   Open Chat
-                                </Button>
+                            </Button>
                               </>
                             )}
                             {req.status === 'denied' && (

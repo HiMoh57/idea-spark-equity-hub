@@ -31,6 +31,7 @@ import ExitIntentModal from '@/components/ExitIntentModal';
 import DelayedSignupBanner from '@/components/DelayedSignupBanner';
 import MobileCTAPopup from '@/components/MobileCTAPopup';
 import DesktopExitIntentModal from '@/components/DesktopExitIntentModal';
+import DeckPreviewPage from './pages/DeckPreviewPage';
 
 const queryClient = new QueryClient();
 
@@ -67,6 +68,7 @@ const App = () => {
               <Route path="/pricing" element={<Pricing />} />
               <Route path="/payment-success" element={<PaymentSuccess />} />
               <Route path="/announcements" element={<AnnouncementsPage />} />
+              <Route path="/fundeer/deck-preview/:deckId" element={<DeckPreviewPage />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
             <OnboardingModal 
