@@ -7,7 +7,6 @@ import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { Link } from 'react-router-dom';
-import UpiPaymentModal from './UpiPaymentModal';
 
 interface IdeaCardProps {
   idea: {
@@ -38,18 +37,18 @@ const IdeaCard: React.FC<IdeaCardProps> = ({
 }) => {
   const { user } = useAuth();
   const { toast } = useToast();
-  const [paymentModalOpen, setPaymentModalOpen] = useState(false);
   const [isInterested, setIsInterested] = useState(false);
   const [isSaved, setIsSaved] = useState(false);
   const [hasAccess, setHasAccess] = useState(showFullDescription);
   const [creatorName, setCreatorName] = useState('Anonymous');
-  const [pendingVerification, setPendingVerification] = useState(false);
-  const [accessGranted, setAccessGranted] = useState(false);
+  const [requestStatus, setRequestStatus] = useState<'none' | 'pending' | 'approved' | 'denied'>("none");
+  const [requestId, setRequestId] = useState<string | null>(null);
 
   useEffect(() => {
     if (user) {
       checkUserInteractions();
       fetchCreatorName();
+      checkAccessRequest();
     }
   }, [user, idea.id]);
 
@@ -93,9 +92,8 @@ const IdeaCard: React.FC<IdeaCardProps> = ({
         
         if (accessData.status === 'approved' && verificationStatus === 'verified') {
           setHasAccess(true);
-          setAccessGranted(true);
         } else if (verificationStatus === 'pending') {
-          setPendingVerification(true);
+          setRequestStatus('pending');
         }
       }
     } catch (error) {
@@ -116,6 +114,28 @@ const IdeaCard: React.FC<IdeaCardProps> = ({
       }
     } catch (error) {
       console.error('Error fetching creator name:', error);
+    }
+  };
+
+  const checkAccessRequest = async () => {
+    if (!user) return;
+    try {
+      const { data, error } = await supabase
+        .from('access_requests')
+        .select('id, status')
+        .eq('idea_id', idea.id)
+        .eq('requester_id', user.id)
+        .single();
+      if (data) {
+        setRequestId(data.id);
+        setRequestStatus(data.status);
+      } else {
+        setRequestStatus('none');
+        setRequestId(null);
+      }
+    } catch (e) {
+      setRequestStatus('none');
+      setRequestId(null);
     }
   };
 
@@ -191,26 +211,35 @@ const IdeaCard: React.FC<IdeaCardProps> = ({
     }
   };
 
-  const handleRequestAccess = () => {
+  const handleRequestAccess = async () => {
     if (!user) {
       toast({
         title: "Please log in",
-        description: "You need to be logged in to access full idea descriptions.",
+        description: "You need to be logged in to request access.",
         variant: "destructive"
       });
       return;
     }
-
-    setPaymentModalOpen(true);
-  };
-
-  const handlePaymentSubmitted = () => {
-    toast({
-      title: "Payment submitted for verification!",
-      description: "We'll verify your payment and grant access within 24 hours."
-    });
-    setPendingVerification(true);
-    onAccessGranted?.();
+    if (requestStatus === 'pending' || requestStatus === 'approved') return;
+    try {
+      const { data, error } = await supabase
+        .from('access_requests')
+        .insert({
+          idea_id: idea.id,
+          requester_id: user.id,
+          creator_id: idea.creator_id,
+          status: 'pending',
+          created_at: new Date().toISOString()
+        })
+        .select()
+        .single();
+      if (error) throw error;
+      setRequestId(data.id);
+      setRequestStatus('pending');
+      toast({ title: 'Request sent!', description: 'The creator will review your request soon.' });
+    } catch (error: any) {
+      toast({ title: 'Error', description: error.message, variant: 'destructive' });
+    }
   };
 
   const isIdeaValidated = () => {
@@ -324,44 +353,35 @@ const IdeaCard: React.FC<IdeaCardProps> = ({
               </Button>
             </Link>
 
-            {!hasAccess && !pendingVerification && !accessGranted && (
-              <Button 
+            {/* Request Access Button */}
+            {!hasAccess && (
+              <Button
                 onClick={handleRequestAccess}
                 className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
                 size="sm"
+                disabled={requestStatus === 'pending' || requestStatus === 'approved'}
               >
-                <Lock className="h-4 w-4 mr-2" />
-                Access Full Details - ₹150
+                {requestStatus === 'pending' && 'Request Pending'}
+                {requestStatus === 'approved' && '✅ Access Granted'}
+                {requestStatus === 'denied' && '❌ Request Denied'}
+                {requestStatus === 'none' && '🔓 Request Access'}
               </Button>
             )}
 
-            {pendingVerification && !accessGranted && (
-              <div className="w-full p-3 bg-yellow-50 border border-yellow-200 rounded-lg text-center">
-                <p className="text-sm text-yellow-800 font-medium">⏱️ Payment Under Verification</p>
-                <p className="text-xs text-yellow-700">We'll grant access within 24 hours</p>
-              </div>
-            )}
-
-            {accessGranted && (
-              <div className="w-full p-3 bg-green-50 border border-green-200 rounded-lg text-center">
-                <div className="flex items-center justify-center gap-2">
-                  <CheckCircle className="h-4 w-4 text-green-600" />
-                  <p className="text-sm text-green-800 font-medium">Access Granted</p>
-                </div>
-                <p className="text-xs text-green-700">Check your dashboard for full access</p>
-              </div>
+            {requestStatus === 'approved' && user && (
+              <Link to={`/chat?ideaId=${idea.id}&userId=${idea.creator_id}`}>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="w-full mt-2 bg-gradient-to-r from-green-100 to-blue-100 border-green-200 text-green-700 hover:from-green-200 hover:to-blue-200"
+                >
+                  💬 Open Chat
+                </Button>
+              </Link>
             )}
           </div>
         </CardContent>
       </Card>
-
-      <UpiPaymentModal
-        isOpen={paymentModalOpen}
-        onClose={() => setPaymentModalOpen(false)}
-        ideaId={idea.id}
-        ideaTitle={idea.title}
-        onPaymentSubmitted={handlePaymentSubmitted}
-      />
     </>
   );
 };

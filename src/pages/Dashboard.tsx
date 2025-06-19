@@ -465,30 +465,77 @@ const Dashboard = () => {
                 {accessRequests.length === 0 ? (
                   <Card className="bg-white/80 backdrop-blur-xl border-0 shadow-xl">
                     <CardContent className="text-center py-16">
-                      <div className="w-24 h-24 bg-gradient-to-br from-purple-100 to-pink-100 rounded-full flex items-center justify-center mx-auto mb-6">
-                        <MessageSquare className="h-12 w-12 text-purple-600" />
+                      <div className="w-24 h-24 bg-gradient-to-br from-blue-100 to-purple-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                        <MessageSquare className="h-12 w-12 text-blue-600" />
                       </div>
-                      <h3 className="text-2xl font-bold text-slate-900 mb-3">No access requests</h3>
-                      <p className="text-slate-600">When executors request access to your ideas, they'll appear here.</p>
+                      <h3 className="text-2xl font-bold text-slate-900 mb-3">No access requests yet</h3>
+                      <p className="text-slate-600 mb-6 max-w-md mx-auto">You haven't received any access requests for your ideas yet.</p>
                     </CardContent>
                   </Card>
                 ) : (
                   <div className="grid gap-6">
-                    {accessRequests.map((request: any) => (
-                      <Card key={request.id} className="bg-white/80 backdrop-blur-xl border-0 shadow-xl hover:shadow-2xl transition-all duration-300">
-                        <CardContent className="p-8">
-                          <div className="flex justify-between items-start mb-4">
-                            <div className="flex-1">
-                              <h3 className="text-xl font-semibold text-slate-900 mb-2">{request.ideas.title}</h3>
-                              <p className="text-slate-600">Requested by: {request.executor_id}</p>
+                    {accessRequests.map((req: any) => (
+                      <Card key={req.id} className="bg-white/80 backdrop-blur-xl border-0 shadow-xl hover:shadow-2xl transition-all duration-300 group overflow-hidden">
+                        <CardContent className="p-6 flex flex-col md:flex-row md:items-center md:justify-between gap-6">
+                          <div className="flex-1">
+                            <div className="flex items-center gap-3 mb-2">
+                              <h4 className="text-lg font-bold text-slate-900">{req.ideas?.title || 'Idea'}</h4>
+                              <Badge variant="outline" className="bg-gradient-to-r from-blue-100 to-purple-100 text-blue-700 border-blue-200">
+                                {req.status.charAt(0).toUpperCase() + req.status.slice(1)}
+                              </Badge>
                             </div>
-                            <Button 
-                              variant="outline" 
-                              onClick={() => navigate(`/view-request/${request.id}`)}
-                              className="border-blue-200 text-blue-600 hover:bg-blue-50"
-                            >
-                              View Details
-                            </Button>
+                            <div className="text-slate-600 text-sm mb-2">Requested by: <span className="font-medium">{req.requester_id}</span></div>
+                            <div className="text-xs text-slate-500">Requested on: {new Date(req.created_at).toLocaleString()}</div>
+                          </div>
+                          <div className="flex gap-2">
+                            {req.status === 'pending' && (
+                              <>
+                                <Button
+                                  size="sm"
+                                  className="bg-green-600 text-white hover:bg-green-700"
+                                  onClick={async () => {
+                                    await supabase
+                                      .from('access_requests')
+                                      .update({ status: 'approved' })
+                                      .eq('id', req.id);
+                                    toast({ title: 'Request approved!' });
+                                    fetchDashboardData();
+                                  }}
+                                >
+                                  Approve
+                                </Button>
+                                <Button
+                                  size="sm"
+                                  className="bg-red-600 text-white hover:bg-red-700"
+                                  onClick={async () => {
+                                    await supabase
+                                      .from('access_requests')
+                                      .update({ status: 'denied' })
+                                      .eq('id', req.id);
+                                    toast({ title: 'Request denied.' });
+                                    fetchDashboardData();
+                                  }}
+                                >
+                                  Deny
+                                </Button>
+                              </>
+                            )}
+                            {req.status === 'approved' && (
+                              <>
+                                <span className="text-green-700 font-semibold">Approved</span>
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  className="ml-2"
+                                  onClick={() => navigate(`/chat?ideaId=${req.idea_id}&userId=${req.requester_id}`)}
+                                >
+                                  Open Chat
+                                </Button>
+                              </>
+                            )}
+                            {req.status === 'denied' && (
+                              <span className="text-red-700 font-semibold">Denied</span>
+                            )}
                           </div>
                         </CardContent>
                       </Card>
